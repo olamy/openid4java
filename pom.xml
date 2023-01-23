@@ -22,7 +22,6 @@
   <url>http://code.google.com/p/openid4java/</url>
 
   <properties>
-    <
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jetty.version>6.0.2</jetty.version>
