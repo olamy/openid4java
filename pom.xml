@@ -2,10 +2,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/maven-v4_0_0.xsd"
 >
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.openid4java</groupId>
+  <groupId>io.github.olamy</groupId>
   <artifactId>openid4java</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>OpenID4Java</name>
   <description>
@@ -14,11 +21,8 @@
   </description>
   <url>http://code.google.com/p/openid4java/</url>
 
-  <prerequisites>
-    <maven>2.2.1</maven>
-  </prerequisites>
-
   <properties>
+    <
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jetty.version>6.0.2</jetty.version>
@@ -67,7 +71,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.0</version>
+          <version>3.10.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -92,7 +96,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.9</version>
+          <version>3.4.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -775,17 +779,14 @@
     <url>http://openid4java.googlecode.com/svn/trunk/</url>
   </scm>
   <distributionManagement>
-    <!-- https://docs.sonatype.com/display/NX/OSS+Repository+Hosting -->
-    <repository>
-      <id>openid4java-staging</id>
-      <name>OpenID4Java Staging Repository</name>
-      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
     <snapshotRepository>
-      <id>openid4java-snapshots</id>
-      <name>OpenID4Java Snapshot Repository</name>
-      <url>http://oss.sonatype.org/content/repositories/openid4java-snapshots/</url>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
   </distributionManagement>
 
   <profiles>
