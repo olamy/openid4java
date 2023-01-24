@@ -12,19 +12,19 @@ import java.util.Date;
 /**
  * 
  * JDBC implementation of a NonceVerifier.
- * <p>
+ * <div>
  * The JdbcNonceVerifier requires a a javax.sql.DataSource to be configured
  * and passed in to it with the setDataSource setter method. The table name
  * also needs to be specified, either through the constructor, or through the
  * setTableName setter.
- * </p>
- * <p>
+ * </div>
+ * <div>
  * Since the nonces are constructed on the web server and not on the shared
  * database server, they may accidentally collide. Also, if the machines
  * clocks are out of sync, the nonces from the machine that is behind may be
  * removed prematurely from the database by the other machine.
- * </p>
- * <p>
+ * </div>
+ * <div>
  * The specified table must have the following structure:
  * <ul>
  * <li>opurl : string</li>
@@ -32,7 +32,7 @@ import java.util.Date;
  * <li>date : datetime</li>
  * <li>primary key : opurl, nonce</li>
  * </ul>
- * </p>
+ * </div>
  * 
  * @author Andrew Evenson, Graff Haley
  *  Created May 19, 2008
