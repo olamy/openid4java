@@ -58,9 +58,9 @@ public class ConsumerAndProviderTest extends TestCase
         context.addServlet(new ServletHolder(new ProviderServlet(server)), "/provider");
         _server.start();
         int servletPort = ((ServerConnector) _server.getConnectors()[0]).getLocalPort();
-        _baseUrl = "http://localhost:" + servletPort;
-        consumer.returnToUrl = _baseUrl;
-        server.manager.setOPEndpointUrl(_baseUrl);
+        _baseUrl = "http://localhost:" + servletPort;// + "/";
+        consumer.returnToUrl = _baseUrl + "/loginCallback";
+        server.manager.setOPEndpointUrl(_baseUrl + "/provider");
     }
 
     protected void tearDown() throws Exception
