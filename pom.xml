@@ -24,30 +24,37 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <jetty.version>6.0.2</jetty.version>
-    <test.data.src>${basedir}/test/yadisdata</test.data.src>
+    <maven.compiler.release>11</maven.compiler.release>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <jetty.version>10.0.13</jetty.version>
+    <test.data.src>${basedir}/src/test/yadisdata</test.data.src>
     <test.data.build>${basedir}/target/test-data</test.data.build>
+    <test.servlet.port>0</test.servlet.port>
+    <slf4j.version>1.7.36</slf4j.version>
   </properties>
 
   <build>
-    <sourceDirectory>${basedir}/src</sourceDirectory>
     <resources>
       <resource>
-        <directory>${basedir}/src</directory>
+        <directory>${basedir}/src/main/java</directory>
         <includes>
           <include>**/*.properties</include>
           <include>**/*.xsd</include>
         </includes>
       </resource>
     </resources>
-    <testSourceDirectory>${basedir}/test/src</testSourceDirectory>
     <testResources>
       <testResource>
-        <directory>${basedir}/test/src</directory>
+        <directory>${basedir}/src/test/java</directory>
         <includes>
           <include>**/*.properties</include>
           <include>**/*.html</include>
         </includes>
+      </testResource>
+      <testResource>
+        <directory>${test.data.src}</directory>
+        <targetPath>${test.data.build}</targetPath>
       </testResource>
     </testResources>
     <pluginManagement>
@@ -96,6 +103,10 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.4.1</version>
+          <configuration>
+            <failOnWarnings>false</failOnWarnings>
+            <failOnError>true</failOnError>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -174,8 +185,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <debug>true</debug>
-          <optimize>true</optimize>
           <excludes>
             <exclude>**/xri/**</exclude>
             <exclude>**/infocard/**</exclude>
@@ -205,64 +214,6 @@
           </archive>
         </configuration>
       </plugin>
-      <!-- http://mojo.codehaus.org/properties-maven-plugin/ -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>read-project-properties</goal>
-            </goals>
-            <configuration>
-              <files>
-                <file>project.properties</file>
-              </files>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- clean coverage data before collecting -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>process-test-resources</phase>
-            <configuration>
-              <tasks unless="maven.test.skip">
-                <echo message="To skip me, just call mvn -Dmaven.test.skip=true" />
-                <delete dir="${test.data.build}" />
-                <copy todir="${test.data.build}">
-                  <fileset dir="${test.data.src}" />
-                </copy>
-                <replace token="SERVLET_PORT" value="${test.servlet.port}" dir="${test.data.build}" />
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <excludes>
-            <exclude>**/xri/**</exclude>
-            <exclude>**/infocard/**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -278,7 +229,7 @@
             </property>
             <property>
               <name>TEST_DATA</name>
-              <value>${basedir}/test/src/org/openid4java/</value>
+              <value>${basedir}/src/test/java/org/openid4java/</value>
             </property>
           </systemProperties>
         </configuration>
@@ -328,14 +279,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <downloadSources>true</downloadSources>
-          <downloadJavadocs>true</downloadJavadocs>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
@@ -343,114 +286,18 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.3.1</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
-        <configuration>
-          <minmemory>128m</minmemory>
-          <maxmemory>512m</maxmemory>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <linkJavadoc>true</linkJavadoc>
-          <javadocDir>apidocs</javadocDir>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <tags>
-            <tag>TODO</tag>
-            <tag>FIXME</tag>
-            <tag>@todo</tag>
-            <tag>@deprecated</tag>
-          </tags>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.5</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.10</version>
-        <configuration>
-          <showSuccess>false</showSuccess>
-        </configuration>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>report-only</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <configLocation>${basedir}/openid4java_checks.xml</configLocation>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.3.2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <linkXref>true</linkXref>
-          <minimumTokens>100</minimumTokens>
-          <targetJdk>${jvm.ver}</targetJdk>
-        </configuration>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>pmd</report>
-              <report>cpd</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rat-maven-plugin</artifactId>
-        <version>1.0-alpha-3</version>
+        <version>3.4.1</version>
       </plugin>
     </plugins>
   </reporting>
-
-  <repositories>
-    <repository>
-      <id>openid4java-snapshots</id>
-      <name>OpenID4Java Snapshot Repository</name>
-      <url>https://oss.sonatype.org/content/repositories/openid4java-snapshots/</url>
-      <snapshots />
-    </repository>
-  </repositories>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
-        <version>2.0</version>
+        <version>5.1.0</version>
       </dependency>
       <dependency>
         <groupId>net.sf.ehcache</groupId>
@@ -504,13 +351,10 @@
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>jetty</groupId>
-        <artifactId>jetty-util</artifactId>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <type>pom</type>
+        <scope>import</scope>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
@@ -533,7 +377,7 @@
       <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
-        <version>2.8.1</version>
+        <version>2.12.2</version>
       </dependency>
       <dependency>
         <groupId>xml-security</groupId>
@@ -594,6 +438,12 @@
 
     <!-- Test -->
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <version>1.8.0.10</version>
@@ -610,13 +460,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>jetty</groupId>
-      <artifactId>jetty</artifactId>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>jetty</groupId>
-      <artifactId>jetty-util</artifactId>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlets</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -758,24 +613,10 @@
       </roles>
     </contributor>
   </contributors>
-  <mailingLists>
-    <mailingList>
-      <name>OpenID4Java</name>
-      <subscribe>openid4java@googlegroups.com</subscribe>
-      <unsubscribe>openid4java-unsubscribe@googlegroups.com</unsubscribe>
-      <post>openid4java@googlegroups.com</post>
-      <archive>http://groups.google.com/group/openid4java</archive>
-    </mailingList>
-  </mailingLists>
-  <issueManagement>
-    <system>Google Code Issue</system>
-    <url>http://code.google.com/p/openid4java/issues/list</url>
-  </issueManagement>
   <scm>
-    <connection>scm:svn:http://openid4java.googlecode.com/svn/trunk/</connection>
-    <developerConnection>scm:svn:https://openid4java.googlecode.com/svn/trunk/</developerConnection>
-    <tag>HEAD</tag>
-    <url>http://openid4java.googlecode.com/svn/trunk/</url>
+    <connection>scm:git:https://github.com/olamy/openid4java</connection>
+    <developerConnection>scm:git:https://github.com/olamy/openid4java</developerConnection>
+    <url>https://github.com/olamy/openid4java</url>
   </scm>
   <distributionManagement>
     <snapshotRepository>
@@ -789,27 +630,6 @@
   </distributionManagement>
 
   <profiles>
-    <profile>
-      <id>alchim-deploy</id>
-      <distributionManagement>
-        <repository>
-          <id>alchim.sf.net</id>
-          <name>sourceforge</name>
-          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/download/releases</url>
-        </repository>
-        <snapshotRepository>
-          <id>alchim.sf.net</id>
-          <name>sourceforge</name>
-          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/download/snapshots</url>
-          <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-        <site>
-          <id>alchim.sf.net</id>
-          <name>sourceforge</name>
-          <url>scp://alchim.sf.net/home/groups/a/al/alchim/htdocs/openid4java</url>
-        </site>
-      </distributionManagement>
-    </profile>
     <profile>
       <id>release</id>
       <build>
