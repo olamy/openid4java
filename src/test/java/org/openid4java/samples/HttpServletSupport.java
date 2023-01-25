@@ -4,15 +4,16 @@
 
 package org.openid4java.samples;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
 
 public abstract class HttpServletSupport extends HttpServlet
 {
@@ -24,16 +25,11 @@ public abstract class HttpServletSupport extends HttpServlet
 
     public HttpServletSupport()
     {
-        logger_ = Logger.getLogger(getClass());
+        logger_ = LoggerFactory.getLogger(getClass());
     }
 
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        count_++;
-        String ndcName = getClass().getName();
-        ndcName = ndcName.substring(ndcName.lastIndexOf('.')+1);
-        NDC.push(ndcName);
-        NDC.push("call-" + count_);
         logger_.info("begin onService");
         try
         {
@@ -47,8 +43,6 @@ public abstract class HttpServletSupport extends HttpServlet
         finally
         {
             logger_.info("end onService");
-            NDC.pop();
-            NDC.pop();
         }
     }
 
