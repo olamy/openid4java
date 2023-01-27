@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The OpenID Association Response message.
@@ -27,21 +27,17 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AssociationResponse extends Message
 {
-    private static Log _log = LogFactory.getLog(AssociationResponse.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssociationResponse.class);
 
-    protected final static List requiredFields = Arrays.asList( new String[] {
-            "assoc_type",
+    protected final static List<String> requiredFields = Arrays.asList("assoc_type",
             "assoc_handle",
-            "expires_in"
-    });
-    protected final static List optionalFields = Arrays.asList( new String[] {
+            "expires_in");
+    protected final static List<String> optionalFields = Arrays.asList(
             "ns",                       // not in v1 messages
             "session_type",             // can be missing in v1
             "mac_key",
             "enc_mac_key",
-            "dh_server_public"
-    });
+            "dh_server_public");
 
     /**
      * Constructs an AssociationResponse for a given association request.
@@ -53,8 +49,8 @@ public class AssociationResponse extends Message
     protected AssociationResponse(AssociationRequest assocReq, Association assoc)
             throws AssociationException
     {
-        if (DEBUG)
-            _log.debug("Creating association response, type: " + assocReq.getType()
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Creating association response, type: " + assocReq.getType()
                        + " association handle: " + assoc.getHandle());
 
         if (assocReq.isVersion2()) set("ns", OPENID2_NS);
@@ -64,8 +60,8 @@ public class AssociationResponse extends Message
 
         setAssocHandle(assoc.getHandle());
 
-        Long expiryIn = new Long( ( assoc.getExpiry().getTime() -
-                                    System.currentTimeMillis() ) / 1000 );
+        Long expiryIn = (assoc.getExpiry().getTime() -
+                System.currentTimeMillis()) / 1000;
         setExpire(expiryIn);
 
         if (type.getHAlgorithm() != null) // DH session, encrypt the MAC key
@@ -104,7 +100,7 @@ public class AssociationResponse extends Message
 
         resp.validate();
 
-        if (DEBUG) _log.debug("Created association response:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created association response:\n"
                               + resp.keyValueFormEncoding());
 
         return resp;
@@ -117,8 +113,8 @@ public class AssociationResponse extends Message
 
         resp.validate();
 
-        if (DEBUG)
-            _log.debug("Created association response from message parameters:\n"
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created association response from message parameters:\n"
                        + resp.keyValueFormEncoding() );
         return resp;
     }
@@ -312,7 +308,7 @@ public class AssociationResponse extends Message
     public Association getAssociation(DiffieHellmanSession dhSess)
             throws AssociationException
     {
-        if (DEBUG) _log.debug("Retrieving MAC key from association response...");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Retrieving MAC key from association response...");
 
         String handle = getParameterValue("assoc_handle");
         int expiresIn = Integer.parseInt(
@@ -328,7 +324,7 @@ public class AssociationResponse extends Message
             macKey = dhSess.decryptMacKey(
                     getParameterValue("enc_mac_key"),
                     getParameterValue("dh_server_public") );
-            if (DEBUG) _log.debug("Decrypted MAC key (base64): " +
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Decrypted MAC key (base64): " +
                                   new String(Base64.encodeBase64(macKey)));
         }
         else
@@ -336,7 +332,7 @@ public class AssociationResponse extends Message
             macKey = Base64.decodeBase64(
                     getParameterValue("mac_key").getBytes() );
 
-            if (DEBUG) _log.debug("Unencrypted MAC key (base64): "
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Unencrypted MAC key (base64): "
                                   + getParameterValue("mac_key"));
         }
 
@@ -351,7 +347,7 @@ public class AssociationResponse extends Message
         else
             throw new AssociationException("Unknown association type: " + type);
 
-        if (DEBUG) _log.debug("Created association for handle: " + handle);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created association for handle: " + handle);
 
         return assoc;
     }

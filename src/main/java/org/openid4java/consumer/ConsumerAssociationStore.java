@@ -14,11 +14,11 @@ import org.openid4java.association.Association;
 @ImplementedBy(InMemoryConsumerAssociationStore.class)
 public interface ConsumerAssociationStore
 {
-    public void save(String opUrl, Association association);
+    void save(String opUrl, Association association);
 
-    public Association load(String opUrl, String handle);
+    Association load(String opUrl, String handle);
 
-    public Association load(String opUrl);
+    Association load(String opUrl);
 
-    public void remove(String opUrl, String handle);
+    void remove(String opUrl, String handle);
 }

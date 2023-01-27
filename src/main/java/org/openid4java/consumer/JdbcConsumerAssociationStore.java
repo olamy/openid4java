@@ -5,10 +5,10 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,7 +32,7 @@ public class JdbcConsumerAssociationStore
 		extends JdbcDaoSupport
 		implements ConsumerAssociationStore
 {
-	private static Log _log = LogFactory.getLog ( JdbcConsumerAssociationStore.class ) ;
+	private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConsumerAssociationStore.class);
 
 	private String _tableName ;
 	private String _sqlInsert ;
@@ -107,27 +107,27 @@ public class JdbcConsumerAssociationStore
 															+ "retrieved from database: "
 															+ type ) ;
 
-			if ( _log.isDebugEnabled ( ) )
-				_log.debug ( "Retrieved association for handle: " + handle
+			if ( LOGGER.isDebugEnabled ( ) )
+				LOGGER.debug ( "Retrieved association for handle: " + handle
 								+ " from table: " + _tableName ) ;
 
 			return assoc ;
 		}
 		catch ( AssociationException ase )
 		{
-			_log.error ( "Error retrieving association from table: "
+			LOGGER.error ( "Error retrieving association from table: "
 							+ _tableName, ase ) ;
 			return null ;
 		}
 		catch ( IncorrectResultSizeDataAccessException rse )
 		{
-			_log.warn ( "Association not found for handle: " + handle
+			LOGGER.warn ( "Association not found for handle: " + handle
 						+ " in the table: " + _tableName ) ;
 			return null ;
 		}
 		catch ( DataAccessException dae )
 		{
-			_log.error ( "Error retrieving association for handle: " + handle
+			LOGGER.error ( "Error retrieving association for handle: " + handle
 							+ "from table: " + _tableName, dae ) ;
 			return null ;
 		}
@@ -177,27 +177,27 @@ public class JdbcConsumerAssociationStore
 
             }
 
-			if ( _log.isDebugEnabled ( ) )
-				_log.debug ( "Retrieved association for handle: " + handle
+			if ( LOGGER.isDebugEnabled ( ) )
+				LOGGER.debug ( "Retrieved association for handle: " + handle
 								+ " from table: " + _tableName ) ;
 
 			return assoc ;
 		}
 		catch ( AssociationException ase )
 		{
-			_log.error ( "Error retrieving association from table: "
+			LOGGER.error ( "Error retrieving association from table: "
 							+ _tableName, ase ) ;
 			return null ;
 		}
 		catch ( IncorrectResultSizeDataAccessException rse )
 		{
-			_log.warn ( "Association not found for opUrl: " + opUrl
+			LOGGER.warn ( "Association not found for opUrl: " + opUrl
 						+ " in the table: " + _tableName ) ;
 			return null ;
 		}
 		catch ( DataAccessException dae )
 		{
-			_log.error ( "Error retrieving association for opUrl: " + opUrl
+			LOGGER.error ( "Error retrieving association for opUrl: " + opUrl
 							+ "from table: " + _tableName, dae ) ;
 			return null ;
 		}
@@ -214,7 +214,7 @@ public class JdbcConsumerAssociationStore
 		}
 		catch ( Exception e )
 		{
-			_log.error (	"Error removing association from table: "
+			LOGGER.error (	"Error removing association from table: "
 									+ _tableName,
 							e ) ;
 		}
@@ -241,7 +241,7 @@ public class JdbcConsumerAssociationStore
 		}
 		catch ( Exception e )
 		{
-			_log.error ( "Error saving association to table: " + _tableName, e ) ;
+			LOGGER.error ( "Error saving association to table: " + _tableName, e ) ;
 		}
 	}
 
@@ -254,13 +254,13 @@ public class JdbcConsumerAssociationStore
 			int cnt = jdbcTemplate.update ( _sqlCleanup, new Object[]
 				{ boundary } ) ;
 
-			if ( _log.isDebugEnabled ( ) )
-				_log.debug ( "Client associations cleanup removed " + cnt
+			if ( LOGGER.isDebugEnabled ( ) )
+				LOGGER.debug ( "Client associations cleanup removed " + cnt
 								+ " entries" ) ;
 		}
 		catch ( Exception e )
 		{
-			_log.error ( "Error cleaning up client associations from table: "
+			LOGGER.error ( "Error cleaning up client associations from table: "
 							+ _tableName, e ) ;
 		}
 	}

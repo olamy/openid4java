@@ -7,11 +7,11 @@ package org.openid4java.message.ax;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for Attribute Exchange store responses.
@@ -20,8 +20,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StoreResponse extends AxMessage
 {
-    private static Log _log = LogFactory.getLog(StoreResponse.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(StoreResponse.class);
 
     /**
      * Constructs a Store Response with an empty parameter list.
@@ -30,7 +29,7 @@ public class StoreResponse extends AxMessage
     {
         _parameters.set(new Parameter("mode", "store_response_success"));
 
-        if (DEBUG) _log.debug("Created empty store request.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty store request.");
     }
 
     /**
@@ -68,8 +67,8 @@ public class StoreResponse extends AxMessage
         if (! resp.isValid())
             throw new MessageException("Invalid parameters for a store response");
 
-        if (DEBUG)
-            _log.debug("Created store response from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created store response from parameter list:\n {}", params);
 
         return resp;
     }
@@ -121,7 +120,7 @@ public class StoreResponse extends AxMessage
                 ( ! "store_response_success".equals(_parameters.getParameterValue("mode")) &&
                   ! "store_response_failure".equals(_parameters.getParameterValue("mode")) ) )
         {
-            _log.warn("Invalid mode value in store response: "
+            LOGGER.warn("Invalid mode value in store response: "
                       + _parameters.getParameterValue("mode"));
             return false;
         }
@@ -135,7 +134,7 @@ public class StoreResponse extends AxMessage
             if (! paramName.equals("mode") &&
                     ! paramName.equals("error"))
             {
-                _log.warn("Invalid parameter name in store response: " + paramName);
+                LOGGER.warn("Invalid parameter name in store response: " + paramName);
                 return false;
             }
         }

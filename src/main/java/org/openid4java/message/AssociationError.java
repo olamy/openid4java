@@ -6,32 +6,24 @@ package org.openid4java.message;
 
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class AssociationError extends DirectError
 {
-    private static Log _log = LogFactory.getLog(AssociationError.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssociationError.class);
 
     public static final String ASSOC_ERR = "unsupported-type";
 
-    protected final static List requiredFields = Arrays.asList( new String[] {
-            "ns",
-            "error_code",
-            "error",
-    });
+    protected final static List<String> requiredFields = Arrays.asList("ns", "error_code", "error");
 
-    protected final static List optionalFields = Arrays.asList( new String[] {
-            "assoc_type",
-            "session_type"
-    });
+    protected final static List<String> optionalFields = Arrays.asList("assoc_type", "session_type");
 
     protected AssociationError(String msg, AssociationSessionType type)
     {
@@ -59,7 +51,7 @@ public class AssociationError extends DirectError
         }
         catch (MessageException e)
         {
-            _log.error("Invalid association error message created, " +
+            LOGGER.error("Invalid association error message created, " +
                        "type: " + type + " message: " + msg, e);
         }
 
@@ -76,7 +68,7 @@ public class AssociationError extends DirectError
         }
         catch (MessageException e)
         {
-            _log.error("Invalid association error message created: "
+            LOGGER.error("Invalid association error message created: "
                        + err.keyValueFormEncoding(), e );
         }
 

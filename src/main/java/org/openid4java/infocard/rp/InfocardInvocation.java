@@ -4,10 +4,10 @@
 
 package org.openid4java.infocard.rp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.infocard.OpenIDTokenType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -24,8 +24,7 @@ import java.util.Iterator;
  */
 public class InfocardInvocation
 {
-    private static Log _log = LogFactory.getLog(InfocardInvocation.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static Logger LOGGER = LoggerFactory.getLogger(InfocardInvocation.class);
 
     /**
      * The requested token type (OpenID 1.1 or 2.0)
@@ -78,8 +77,8 @@ public class InfocardInvocation
         _requiredClaims.add(OpenIDTokenType.OPENID_CLAIM);
         _tokenType = tokenType;
 
-        if (DEBUG)
-            _log.debug("Created " + _tokenType + " token type InfocardInvocation");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created " + _tokenType + " token type InfocardInvocation");
     }
 
     /**
@@ -100,8 +99,8 @@ public class InfocardInvocation
         _requiredClaims.addAll(fetch.getAttributes(true).values());
         _optionalClaims.addAll(fetch.getAttributes(false).values());
 
-        if (DEBUG)
-            _log.debug("Created " + _tokenType +
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created " + _tokenType +
                 " token type InfocardInvocation from a FetchRequest.");
     }
 
@@ -269,8 +268,8 @@ public class InfocardInvocation
             object.append(getObjectParam("privacyVersion", Integer.toString(_privacyVersion)));
         }
 
-        if (DEBUG)
-            _log.debug("Generated <object> element: " + object);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Generated <object> element: " + object);
 
         return object.toString();
     }
@@ -284,8 +283,8 @@ public class InfocardInvocation
     {
         StringBuffer xhtml = new StringBuffer();
 
-        if (DEBUG)
-            _log.debug("Generated XHTML invocation snippet: " + xhtml);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Generated XHTML invocation snippet: " + xhtml);
 
         // todo: xhtml
         throw new UnsupportedOperationException("XHTML invocation not implemented");

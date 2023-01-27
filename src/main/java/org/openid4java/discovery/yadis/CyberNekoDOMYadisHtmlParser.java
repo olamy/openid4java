@@ -4,11 +4,11 @@
 
 package org.openid4java.discovery.yadis;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
 import org.openid4java.util.OpenID4JavaDOMParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLMetaElement;
@@ -24,8 +24,7 @@ import javax.xml.transform.TransformerException;
  */
 public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
 {
-    private static final Log _log = LogFactory.getLog(CyberNekoDOMYadisHtmlParser.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CyberNekoDOMYadisHtmlParser.class);
 
     /*
      * (non-Javadoc)
@@ -37,14 +36,14 @@ public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
         String xrdsLocation = null;
 
         HTMLDocumentImpl doc = this.parseDocument(input);
-        if (DEBUG)
+        if (LOGGER.isDebugEnabled())
         {
             try
             {
-                _log.debug("document:\n" + OpenID4JavaDOMParser.toXmlString(doc));
+                LOGGER.debug("document:\n" + OpenID4JavaDOMParser.toXmlString(doc));
             } catch (TransformerException e)
             {
-                _log.debug("An exception occurs while transforming the document to string in debugging.", e);
+                LOGGER.debug("An exception occurs while transforming the document to string in debugging.", e);
             }
         }
 
@@ -60,8 +59,8 @@ public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
         NodeList metaElements = head.getElementsByTagName("META");
         if (metaElements == null || metaElements.getLength() == 0)
         {
-            if (DEBUG)
-                _log.debug("No <meta> element found under <html><head>. " +
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("No <meta> element found under <html><head>. " +
                 "See Yadis specification, section 6.2.5/1.");
         }
         else
@@ -82,8 +81,8 @@ public class CyberNekoDOMYadisHtmlParser implements YadisHtmlParser
                             OpenIDException.YADIS_HTMLMETA_INVALID_RESPONSE);
 
                     xrdsLocation = metaElement.getContent();
-                    if (DEBUG)
-                        _log.debug("Found " + YadisResolver.YADIS_XRDS_LOCATION
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Found " + YadisResolver.YADIS_XRDS_LOCATION
                             + " META tags.");
                 }
             }

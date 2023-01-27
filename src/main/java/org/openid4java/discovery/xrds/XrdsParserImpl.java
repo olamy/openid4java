@@ -1,11 +1,11 @@
 package org.openid4java.discovery.xrds;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.Discovery;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.RuntimeDiscoveryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -23,9 +23,7 @@ import java.util.*;
  */
 public class XrdsParserImpl implements XrdsParser
 {
-    private static final Log _log = LogFactory.getLog(XrdsParserImpl.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(XrdsParserImpl.class);
     private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
     private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
     private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
@@ -45,8 +43,8 @@ public class XrdsParserImpl implements XrdsParser
 
     public List parseXrds(String input, Set targetTypes) throws DiscoveryException
     {
-        if (DEBUG)
-            _log.debug("Parsing XRDS input for service types: " + targetTypes.toString());
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Parsing XRDS input for service types: " + targetTypes.toString());
 
         Document document = parseXmlInput(input);
 
@@ -87,8 +85,8 @@ public class XrdsParserImpl implements XrdsParser
             addServiceType(serviceTypes, serviceNode, type);
         }
 
-        if (DEBUG)
-            _log.debug("Found " + serviceTypes.size() + " services for the requested types.");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Found " + serviceTypes.size() + " services for the requested types.");
 
         // extract local IDs
         Map serviceLocalIDs = extractElementsByParent(XRD_NS, XRD_ELEM_LOCALID, selectedServices, document);
@@ -112,8 +110,8 @@ public class XrdsParserImpl implements XrdsParser
             String delegate = (String) serviceDelegates.get(serviceNode);
 
             XrdsServiceEndpoint endpoint = new XrdsServiceEndpoint(uri, typeSet, getPriority(serviceNode), getPriority(uriNode), localId, delegate, canonicalId);
-            if (DEBUG)
-                _log.debug("Discovered endpoint: \n" + endpoint);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Discovered endpoint: \n" + endpoint);
             result.add(endpoint);
         }
 
@@ -158,8 +156,8 @@ public class XrdsParserImpl implements XrdsParser
             throw new DiscoveryException("Cannot read XML message",
                 OpenIDException.XRDS_DOWNLOAD_ERROR);
 
-        if (DEBUG)
-            _log.debug("Parsing XRDS input: " + input);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Parsing XRDS input: " + input);
 
         try
         {

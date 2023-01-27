@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author Marius Scurtescu, Johnny Bufu
  * @see ParameterList
  */
-public class Parameter implements Comparable, Serializable
+public class Parameter implements Comparable<Parameter>, Serializable
 {
     private String _key;
     private String _value;
@@ -70,10 +70,8 @@ public class Parameter implements Comparable, Serializable
         return _value;
     }
 
-    public int compareTo(Object obj)
+    public int compareTo(Parameter that)
     {
-        Parameter that = (Parameter) obj;
-
         int keyComp = this._key.compareTo(that._key);
 
         if (keyComp == 0) {

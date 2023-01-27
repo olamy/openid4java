@@ -4,19 +4,24 @@
 
 package org.openid4java.consumer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
 import java.text.ParseException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryNonceVerifier extends AbstractNonceVerifier
 {
-    private static Log _log = LogFactory.getLog(InMemoryNonceVerifier.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryNonceVerifier.class);
+    private static final boolean DEBUG = LOGGER.isDebugEnabled();
 
     private Map _opMap = new HashMap();
 
@@ -44,13 +49,13 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
 
         if (seenSet.contains(nonce))
         {
-            _log.error("Possible replay attack! Already seen nonce: " + nonce);
+            LOGGER.error("Possible replay attack! Already seen nonce: " + nonce);
             return SEEN;
         }
 
         seenSet.add(nonce);
 
-        if (DEBUG) _log.debug("Nonce verified: " + nonce);
+        if (DEBUG) LOGGER.debug("Nonce verified: " + nonce);
 
         return OK;
     }
@@ -92,7 +97,7 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
                 String nonce = (String) nonces.next();
 
                 if (DEBUG)
-                    _log.debug("Removing nonce: " + nonce +
+                    LOGGER.debug("Removing nonce: " + nonce +
                                " from OP: " + opUrl);
                 seenSet.remove(nonce);
             }
@@ -106,7 +111,7 @@ public class InMemoryNonceVerifier extends AbstractNonceVerifier
         {
             String opUrl = (String) opUrls.next();
 
-            if (DEBUG) _log.debug("Removed all nonces from OP: " + opUrl);
+            if (DEBUG) LOGGER.debug("Removed all nonces from OP: " + opUrl);
 
             _opMap.remove(opUrl);
         }

@@ -46,22 +46,20 @@ public class DiscoveryInformation implements Serializable
     public final static String OPENID2_OP = "http://specs.openid.net/auth/2.0/server";
     public final static String OPENID2_RP = "http://specs.openid.net/auth/2.0/return_to";
 
-    public static final Set OPENID1_SIGNON_TYPES = new HashSet() {{
-        add(DiscoveryInformation.OPENID10);
-        add(DiscoveryInformation.OPENID11);
-    }};
+    public static final Set<String> OPENID1_SIGNON_TYPES =
+            Set.of(DiscoveryInformation.OPENID10,DiscoveryInformation.OPENID11);
 
-    public static final Set OPENID_SIGNON_TYPES = new HashSet() {{
+    public static final Set<String> OPENID_SIGNON_TYPES = new HashSet() {{
         addAll(DiscoveryInformation.OPENID1_SIGNON_TYPES);
         add(DiscoveryInformation.OPENID2);
     }};
 
-    public static final Set OPENID_OP_TYPES = new HashSet() {{
+    public static final Set<String> OPENID_OP_TYPES = new HashSet() {{
         addAll(OPENID_SIGNON_TYPES);
         add(DiscoveryInformation.OPENID2_OP);
     }};
 
-    public static final Set OPENID_TYPES = new HashSet() {{
+    public static final Set<String> OPENID_TYPES = new HashSet() {{
         addAll(OPENID_OP_TYPES);
         add(DiscoveryInformation.OPENID2_RP);
     }};

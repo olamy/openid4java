@@ -6,19 +6,18 @@ package org.openid4java.consumer;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class EhcacheNonceVerifier extends AbstractNonceVerifier
 {
-    private static Log _log = LogFactory.getLog(EhcacheNonceVerifier.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(EhcacheNonceVerifier.class);
 
     private Cache _cache;
 
@@ -49,13 +48,13 @@ public class EhcacheNonceVerifier extends AbstractNonceVerifier
 
         if (_cache.get(pair) != null)
         {
-            _log.error("Possible replay attack! Already seen nonce: " + nonce);
+            LOGGER.error("Possible replay attack! Already seen nonce: {}", nonce);
             return SEEN;
         }
 
         _cache.put(element);
 
-        if (DEBUG) _log.debug("Nonce verified: " + nonce);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Nonce verified: {}", nonce);
 
         return OK;
     }

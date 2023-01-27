@@ -5,8 +5,8 @@
 package org.openid4java.association;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import javax.crypto.KeyGenerator;
@@ -23,9 +23,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class Association implements Serializable
 {
-    private static Log _log = LogFactory.getLog(Association.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static Logger LOGGER = LoggerFactory.getLogger(Association.class);
     public static final String FAILED_ASSOC_HANDLE      = " ";
     public static final String TYPE_HMAC_SHA1           = "HMAC-SHA1";
     public static final String TYPE_HMAC_SHA256         = "HMAC-SHA256";
@@ -42,7 +40,7 @@ public class Association implements Serializable
 
     private Association(String type, String handle, SecretKey macKey, Date expiry)
     {
-        if (DEBUG) _log.debug("Creating association, type: " + type +
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Creating association, type: " + type +
                               " handle: " + handle + " expires: " + expiry);
         _type = type;
         _handle = handle;
@@ -85,7 +83,7 @@ public class Association implements Serializable
     {
         SecretKey macKey = generateMacSha1Key();
 
-        if (DEBUG) _log.debug("Generated SHA1 MAC key: " + macKey);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Generated SHA1 MAC key: {}", macKey);
 
         return new Association(TYPE_HMAC_SHA1, handle, macKey, expiryIn);
     }
@@ -108,7 +106,7 @@ public class Association implements Serializable
     {
         SecretKey macKey = generateMacSha256Key();
 
-        if (DEBUG) _log.debug("Generated SHA256 MAC key: " + macKey);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Generated SHA256 MAC key: {}", macKey);
 
         return new Association(TYPE_HMAC_SHA256, handle, macKey, expiryIn);
     }
@@ -139,7 +137,7 @@ public class Association implements Serializable
         }
         catch (NoSuchAlgorithmException e)
         {
-            _log.error("Unsupported algorithm: " + algorithm + ", size: " + keySize, e);
+            LOGGER.error("Unsupported algorithm: " + algorithm + ", size: " + keySize, e);
             return null;
         }
     }
@@ -258,13 +256,13 @@ public class Association implements Serializable
 
     public String sign(String text) throws AssociationException
     {
-        if (DEBUG) _log.debug("Computing signature for input data:\n" + text);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Computing signature for input data: \n {}", text);
 
         try
         {
             String signature = new String(Base64.encodeBase64(sign(text.getBytes("utf-8"))), "utf-8");
-            if (DEBUG)
-                _log.debug("Calculated signature: " + signature);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Calculated signature: {}", signature);
             return signature;
         }
         catch (UnsupportedEncodingException e)
@@ -275,7 +273,7 @@ public class Association implements Serializable
 
     public boolean verifySignature(String text, String signature) throws AssociationException
     {
-        if (DEBUG) _log.debug("Verifying signature: " + signature);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Verifying signature: {}", signature);
         // The Java String.equals() method returns on the first difference in
         // its inputs, which allows a timing attack to recover signature values.
         // This verification method will take the same amount of time for any

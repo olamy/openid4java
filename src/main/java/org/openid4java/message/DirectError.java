@@ -4,9 +4,9 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
@@ -16,18 +16,14 @@ import java.util.Arrays;
  */
 public class DirectError extends Message
 {
-    private static Log _log = LogFactory.getLog(DirectError.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectError.class);
 
-    protected final static List requiredFields = Arrays.asList( new String[] {
-            "error"
-    });
+    protected final static List<String> requiredFields = List.of("error");
 
-    protected final static List optionalFields = Arrays.asList( new String[] {
+    protected final static List<String> optionalFields = Arrays.asList(
             "ns",
             "contact",
-            "reference"
-    });
+            "reference");
 
     // exception that generated the error, if any
     private OpenIDException _exception;
@@ -92,11 +88,11 @@ public class DirectError extends Message
         }
         catch (MessageException ex)
         {
-            _log.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
+            LOGGER.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
                        " direct error message created for message: " + msg);
         }
 
-        _log.debug("Created direct error message:\n" + err.keyValueFormEncoding());
+        LOGGER.debug("Created direct error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }
@@ -111,11 +107,12 @@ public class DirectError extends Message
         }
         catch (MessageException e)
         {
-            _log.error("Invalid direct error message created: "
+            LOGGER.error("Invalid direct error message created: "
                        + err.keyValueFormEncoding() );
         }
 
-        _log.debug("Created direct error message:\n" + err.keyValueFormEncoding());
+        if(LOGGER.isDebugEnabled())
+            LOGGER.debug("Created direct error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }

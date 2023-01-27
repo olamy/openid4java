@@ -5,19 +5,18 @@
 package org.openid4java.server;
 
 import org.openid4java.util.InternetDateFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class IncrementalNonceGenerator implements NonceGenerator
 {
-    private static Log _log = LogFactory.getLog(IncrementalNonceGenerator.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncrementalNonceGenerator.class);
 
     private static InternetDateFormat _dateFormat = new InternetDateFormat();
 
@@ -40,7 +39,7 @@ public class IncrementalNonceGenerator implements NonceGenerator
 
         String nonce = _timestamp + Integer.toString(_counter);
 
-        if (DEBUG) _log.debug("Generated nonce: " + nonce);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Generated nonce: {}", nonce);
 
         return nonce;
 

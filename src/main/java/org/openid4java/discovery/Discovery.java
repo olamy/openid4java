@@ -6,13 +6,13 @@ package org.openid4java.discovery;
 
 import com.google.inject.Inject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.discovery.html.HtmlResolver;
 import org.openid4java.discovery.xri.XriResolver;
 import org.openid4java.discovery.yadis.YadisResolver;
 import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.OpenID4JavaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -22,8 +22,7 @@ import java.util.regex.Pattern;
  */
 public class Discovery
 {
-    private static Log _log = LogFactory.getLog(Discovery.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Discovery.class);
 
     private static final Pattern URL_PATTERN =
             Pattern.compile("^https?://", Pattern.CASE_INSENSITIVE);
@@ -39,7 +38,7 @@ public class Discovery
     public static XriResolver getXriResolver()
     {
         String className = OpenID4JavaUtils.getProperty(XRI_RESOLVER_CLASS_NAME_KEY);
-        if (DEBUG) _log.debug(XRI_RESOLVER_CLASS_NAME_KEY + ":" + className);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug(XRI_RESOLVER_CLASS_NAME_KEY + ":" + className);
         try {
             return (XriResolver) Class.forName(className).newInstance();
         } catch (Exception e) {
@@ -94,25 +93,23 @@ public class Discovery
             // strip the xri:// prefix if it exists
             if (identifier.toLowerCase().startsWith("xri://"))
             {
-                if (DEBUG) _log.debug("Dropping xri:// prefix from identifier: "
-                        + identifier);
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Dropping xri:// prefix from identifier: {}", identifier);
                 identifier = identifier.substring(6);
             }
 
             if (URL_PATTERN.matcher(identifier).find())
             {
-                if (DEBUG) _log.debug("Creating URL identifier for: " + identifier);
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Creating URL identifier for: {}", identifier);
                 return new UrlIdentifier(identifier, removeFragment);
             }
             else if (XRI_PATTERN.matcher(identifier).find())
             {
-                if (DEBUG) _log.debug("Creating XRI identifier for: " + identifier);
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Creating XRI identifier for: {}", identifier);
                 return _xriResolver.parseIdentifier(identifier);
             }
             else
             {
-                if (DEBUG) _log.debug("Creating URL identifier (http:// prepended) for: "
-                        + identifier);
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Creating URL identifier (http:// prepended) for: {}", identifier);
                 return new UrlIdentifier("http://" + identifier, removeFragment);
             }
         }
@@ -135,12 +132,12 @@ public class Discovery
 
         if (identifier instanceof XriIdentifier)
         {
-            _log.info("Starting discovery on XRI identifier: " + identifier);
+            LOGGER.info("Starting discovery on XRI identifier: " + identifier);
             result = _xriResolver.discover((XriIdentifier) identifier);
         }
         else if (identifier instanceof UrlIdentifier)
         {
-            _log.info("Starting discovery on URL identifier: " + identifier);
+            LOGGER.info("Starting discovery on URL identifier: " + identifier);
 
             UrlIdentifier urlId = (UrlIdentifier) identifier;
 
@@ -149,7 +146,7 @@ public class Discovery
             // fall-back to HTML discovery
             if (result == null || result.size() == 0)
             {
-                _log.info("No OpenID service endpoints discovered through Yadis;" +
+                LOGGER.info("No OpenID service endpoints discovered through Yadis;" +
                         " attempting HTML discovery...");
 
                 result = _htmlResolver.discoverHtml(urlId);
@@ -161,7 +158,7 @@ public class Discovery
                     "Unknown identifier type: " + identifier.toString());
         }
 
-        _log.info("Discovered " + result.size() + " OpenID endpoints.");
+        LOGGER.info("Discovered " + result.size() + " OpenID endpoints.");
 
         return result;
     }

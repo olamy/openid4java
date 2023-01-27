@@ -18,7 +18,7 @@ public interface MessageExtension
     /**
      * Gets the TypeURI that identifies a extension to the OpenID protocol.
      */
-    public String getTypeUri();
+    String getTypeUri();
 
     /**
      * Gets the extension-specific parameters.
@@ -29,7 +29,7 @@ public interface MessageExtension
      *
      * @see Message
      */
-    public ParameterList getParameters();
+    ParameterList getParameters();
 
     /**
      * Sets the extension-specific parameters.
@@ -41,7 +41,7 @@ public interface MessageExtension
      * @param params
      * @see Message
      */
-    public void  setParameters(ParameterList params);
+    void  setParameters(ParameterList params);
 
     /**
      * Used by the core OpenID authentication implementation to learn whether
@@ -53,7 +53,7 @@ public interface MessageExtension
      * @return  True if the extension provides authentication services,
      *          false otherwise.
      */
-    public boolean providesIdentifier();
+    boolean providesIdentifier();
 
     /**
      * Flag for indicating that an extension must be signed.
@@ -62,6 +62,6 @@ public interface MessageExtension
      *          in positive assertions, or false if there isn't such a
      *          requirement.
      */
-    public boolean signRequired();
+    boolean signRequired();
 
 }

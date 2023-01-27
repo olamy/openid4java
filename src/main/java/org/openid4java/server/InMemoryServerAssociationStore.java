@@ -6,20 +6,22 @@ package org.openid4java.server;
 
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryServerAssociationStore implements ServerAssociationStore
 {
-    private static Log _log = LogFactory.getLog(InMemoryServerAssociationStore.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryServerAssociationStore.class);
     private String _timestamp;
     private int _counter;
     private Map _handleMap;
@@ -42,7 +44,7 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
 
         _handleMap.put(handle, association);
 
-        if (DEBUG) _log.debug("Generated association, handle: " + handle +
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Generated association, handle: " + handle +
                               " type: " + type +
                               " expires in: " + expiryIn + " seconds.");
 
@@ -58,7 +60,7 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
 
     public synchronized void remove(String handle)
     {
-        if (DEBUG) _log.debug("Removing association, handle: " + handle);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Removing association, handle: {}", handle);
 
         _handleMap.remove(handle);
 
@@ -84,7 +86,7 @@ public class InMemoryServerAssociationStore implements ServerAssociationStore
         {
             String handle = (String) handles.next();
 
-            if (DEBUG) _log.debug("Removing expired association, handle: " + handle);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Removing expired association, handle: {}", handle);
 
             _handleMap.remove(handle);
         }

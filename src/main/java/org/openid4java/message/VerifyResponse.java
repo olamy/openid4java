@@ -4,9 +4,9 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
@@ -16,17 +16,12 @@ import java.util.Arrays;
  */
 public class VerifyResponse extends Message
 {
-    private static Log _log = LogFactory.getLog(VerifyResponse.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(VerifyResponse.class);
 
-    protected final static List requiredFields = Arrays.asList(new String[] {
-            "is_valid"
-    });
+    protected final static List<String> requiredFields = List.of("is_valid");
 
-    protected final static List optionalFields = Arrays.asList(new String[] {
-            "ns",
-            "invalidate_handle"
-    });
+    protected final static List<String> optionalFields = Arrays.asList("ns",
+            "invalidate_handle");
 
     protected VerifyResponse(boolean compatibility)
     {
@@ -48,7 +43,7 @@ public class VerifyResponse extends Message
 
         resp.validate();
 
-        if (DEBUG) _log.debug("Created verification response:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created verification response:\n"
                               + resp.keyValueFormEncoding());
 
         return resp;
@@ -61,7 +56,7 @@ public class VerifyResponse extends Message
 
         resp.validate();
 
-        if (DEBUG) _log.debug("Created verification response:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created verification response:\n"
                               + resp.keyValueFormEncoding());
 
         return resp;
@@ -79,8 +74,8 @@ public class VerifyResponse extends Message
 
     public void setSignatureVerified(boolean verified)
     {
-        if (DEBUG)
-            _log.debug("Setting is_valid to: " + verified);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Setting is_valid to: " + verified);
         
         set("is_valid", verified ? "true" : "false");
     }

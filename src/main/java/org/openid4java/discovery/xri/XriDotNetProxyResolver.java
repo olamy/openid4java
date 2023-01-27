@@ -2,8 +2,6 @@ package org.openid4java.discovery.xri;
 
 import com.google.inject.Inject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
@@ -16,6 +14,8 @@ import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.OpenID4JavaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,9 +30,7 @@ import java.util.Set;
  */
 public class XriDotNetProxyResolver implements XriResolver
 {
-    private static Log _log = LogFactory.getLog(XriDotNetProxyResolver.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static Logger LOGGER = LoggerFactory.getLogger(XriDotNetProxyResolver.class);
     private final HttpFetcher _httpFetcher;
 
     private final static String PROXY_URL = "https://xri.net/";
@@ -42,7 +40,7 @@ public class XriDotNetProxyResolver implements XriResolver
     private static final XrdsParser XRDS_PARSER;
     static {
         String className = OpenID4JavaUtils.getProperty(XRDS_PARSER_CLASS_NAME_KEY);
-        if (DEBUG) _log.debug(XRDS_PARSER_CLASS_NAME_KEY + ":" + className);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug(XRDS_PARSER_CLASS_NAME_KEY + ":" + className);
         try
         {
             XRDS_PARSER = (XrdsParser) Class.forName(className).newInstance();
@@ -75,7 +73,7 @@ public class XriDotNetProxyResolver implements XriResolver
     public List discover(XriIdentifier xri) throws DiscoveryException
     {
         String hxri = PROXY_URL + xri.getIdentifier() + "?" + XRDS_QUERY;
-        _log.info("Performing discovery on HXRI: " + hxri);
+        LOGGER.info("Performing discovery on HXRI: " + hxri);
 
         try
         {
@@ -120,7 +118,7 @@ public class XriDotNetProxyResolver implements XriResolver
     public XriIdentifier parseIdentifier(String identifier) throws DiscoveryException
     {
         // todo: http://code.google.com/p/openid4java/issues/detail?id=63
-        _log.warn("Creating XRI identifier with the friendly XRI identifier as the IRI/URI normal forms.");
+        LOGGER.warn("Creating XRI identifier with the friendly XRI identifier as the IRI/URI normal forms.");
         return new XriIdentifier(identifier, identifier, identifier);
     }
 }

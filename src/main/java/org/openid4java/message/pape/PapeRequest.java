@@ -8,11 +8,14 @@ import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for OpenID Provider Authentication Policy requests.
@@ -22,12 +25,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PapeRequest extends PapeMessage
 {
-    private static Log _log = LogFactory.getLog(PapeRequest.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(PapeRequest.class);
+    private static final boolean DEBUG = LOGGER.isDebugEnabled();
 
-    protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
-            "preferred_auth_policies", "preferred_auth_level_types", "max_auth_age"
-    });
+    protected final static List<String> PAPE_FIELDS =
+            Arrays.asList("preferred_auth_policies", "preferred_auth_level_types", "max_auth_age");
 
     /**
      * Constructs a Pape Request with an empty parameter list.
@@ -36,7 +38,7 @@ public class PapeRequest extends PapeMessage
     {
         set("preferred_auth_policies", "");
 
-        if (DEBUG) _log.debug("Created empty Pape request.");
+        if (DEBUG) LOGGER.debug("Created empty Pape request.");
     }
 
     /**
@@ -74,7 +76,7 @@ public class PapeRequest extends PapeMessage
         req.validate();
 
         if (DEBUG)
-            _log.debug("Created PAPE request from parameter list:\n" + params);
+            LOGGER.debug("Created PAPE request from parameter list:\n" + params);
 
         return req;
     }

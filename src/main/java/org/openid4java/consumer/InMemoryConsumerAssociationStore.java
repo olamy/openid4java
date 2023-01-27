@@ -5,20 +5,22 @@
 package org.openid4java.consumer;
 
 import org.openid4java.association.Association;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class InMemoryConsumerAssociationStore implements ConsumerAssociationStore
 {
-    private static Log _log = LogFactory.getLog(InMemoryConsumerAssociationStore.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryConsumerAssociationStore.class);
     private Map _opMap = new HashMap();
 
     public synchronized void save(String opUrl, Association association)
@@ -37,8 +39,8 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
 
         String handle = association.getHandle();
 
-        if(DEBUG)
-            _log.debug("Adding association to the in-memory store: " + handle +
+        if(LOGGER.isDebugEnabled())
+            LOGGER.debug("Adding association to the in-memory store: " + handle +
                        " with OP: " + opUrl);
 
         handleMap.put(association.getHandle(), association);
@@ -96,7 +98,7 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
         {
             Map handleMap = (Map) _opMap.get(opUrl);
 
-            _log.info("Removing association: " + handle + " widh OP: " + opUrl);
+            LOGGER.info("Removing association: " + handle + " widh OP: " + opUrl);
 
             handleMap.remove(handle);
 
@@ -135,7 +137,7 @@ public class InMemoryConsumerAssociationStore implements ConsumerAssociationStor
             {
                 String handle = (String) handles.next();
 
-                _log.info("Removing expired association: " + handle +
+                LOGGER.info("Removing expired association: " + handle +
                           " with OP: " + opUrl);
 
                 handleMap.remove(handle);

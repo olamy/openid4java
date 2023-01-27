@@ -4,8 +4,9 @@
 
 package org.openid4java.association;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Modells the session and association types allowed in OpenID associations.
@@ -21,9 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AssociationSessionType implements Comparable
 {
-    private static Log _log = LogFactory.getLog(AssociationSessionType.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssociationSessionType.class);
     public static final AssociationSessionType NO_ENCRYPTION_SHA1MAC
             = new AssociationSessionType("no-encryption", null,
                         Association.TYPE_HMAC_SHA1, false, 0);
@@ -184,7 +183,7 @@ public class AssociationSessionType implements Comparable
                     + sessType + " : " + assocType +
                     ", compatibility: " + compatibility);
 
-        if (DEBUG) _log.debug("Session:Association Type: " + result);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Session:Association Type: " + result);
 
         return result;
     }

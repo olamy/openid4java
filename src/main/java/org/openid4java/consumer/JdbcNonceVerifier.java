@@ -1,8 +1,8 @@
 
 package org.openid4java.consumer ;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -41,7 +41,7 @@ public class JdbcNonceVerifier
 		extends JdbcDaoSupport
 		implements NonceVerifier
 {
-	private static Log _log = LogFactory.getLog ( JdbcNonceVerifier.class ) ;
+	private static final Logger LOGGER = LoggerFactory.getLogger(JdbcNonceVerifier.class) ;
 
 	private NonceVerifier _verifier ;
 	private String _tableName ;
@@ -121,11 +121,11 @@ public class JdbcNonceVerifier
 			}
 			catch ( DataIntegrityViolationException e )
 			{
-				_log.warn ( "Nonce already seen. Possible replay attack!" ) ;
+				LOGGER.warn ( "Nonce already seen. Possible replay attack!" ) ;
 			}
 			catch ( Exception e )
 			{
-				_log.error ( "Problem executing database method", e ) ;
+				LOGGER.error ( "Problem executing database method", e ) ;
 			}
 
 			return SEEN ;
@@ -140,11 +140,11 @@ public class JdbcNonceVerifier
 				int cnt = jdbcTemplate.update ( _deleteSQL, new Object[]
 					{ boundary } ) ;
 
-				if ( _log.isDebugEnabled ( ) ) _log.debug ( "Client nonce cleanup removed " + cnt + " entries" ) ;
+				if ( LOGGER.isDebugEnabled ( ) ) LOGGER.debug ( "Client nonce cleanup removed " + cnt + " entries" ) ;
 			}
 			catch ( Exception e )
 			{
-				_log.error ( "Error cleaning up client nonces from table: " + _tableName, e ) ;
+				LOGGER.error ( "Error cleaning up client nonces from table: " + _tableName, e ) ;
 			}
 		}
 	}

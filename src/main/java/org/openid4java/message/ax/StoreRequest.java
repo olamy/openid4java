@@ -7,9 +7,8 @@ package org.openid4java.message.ax;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the extension for Attribute Exchange store requests.
@@ -18,8 +17,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StoreRequest extends AxPayload
 {
-    private static Log _log = LogFactory.getLog(StoreRequest.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(StoreRequest.class);
 
     /**
      * Constructs a Store Request with an empty parameter list.
@@ -28,7 +26,7 @@ public class StoreRequest extends AxPayload
     {
         _parameters.set(new Parameter("mode", "store_request"));
 
-        if (DEBUG) _log.debug("Created empty store request.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty store request.");
     }
 
     /**
@@ -66,8 +64,8 @@ public class StoreRequest extends AxPayload
         if (! req.isValid())
             throw new MessageException("Invalid parameters for a store request");
 
-        if (DEBUG)
-            _log.debug("Created store request from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created store request from parameter list:\n {}", params);
 
         return req;
     }
@@ -84,7 +82,7 @@ public class StoreRequest extends AxPayload
         if ( ! _parameters.hasParameter("mode") ||
                 ! "store_request".equals(_parameters.getParameterValue("mode")))
         {
-            _log.warn("Invalid mode value in store_request: "
+            LOGGER.warn("Invalid mode value in store_request: "
                       + _parameters.getParameterValue("mode"));
             return false;
         }

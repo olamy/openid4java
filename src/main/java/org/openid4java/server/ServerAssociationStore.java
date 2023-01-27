@@ -12,9 +12,9 @@ import org.openid4java.association.AssociationException;
  */
 public interface ServerAssociationStore
 {
-    public Association generate(String type, int expiryIn) throws AssociationException;
+    Association generate(String type, int expiryIn) throws AssociationException;
 
-    public Association load(String handle);
+    Association load(String handle);
 
-    public void remove(String handle);
+    void remove(String handle);
 }

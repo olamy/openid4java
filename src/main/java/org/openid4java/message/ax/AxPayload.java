@@ -2,18 +2,22 @@ package org.openid4java.message.ax;
 
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * @author jbufu
  */
 public abstract class AxPayload extends AxMessage {
 
-    private static Log _log = LogFactory.getLog(AxPayload.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AxPayload.class);
 
     private int _attrAliasCounter = 0;
 
@@ -63,8 +67,8 @@ public abstract class AxPayload extends AxMessage {
         _parameters.set(new Parameter("value." + alias + index, value));
         setCount(alias, ++count);
 
-        if (DEBUG)
-            _log.debug("Added new attribute to AX payload; type: " + typeUri
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Added new attribute to AX payload; type: " + typeUri
                        + " alias: " + alias + " count: " + count);
     }
 
@@ -85,8 +89,8 @@ public abstract class AxPayload extends AxMessage {
         _parameters.set(new Parameter("type." + alias, typeUri));
         _parameters.set(new Parameter("value." + alias, value));
 
-        if (DEBUG)
-            _log.debug("Added new attribute to the AX payload; type: " + typeUri
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Added new attribute to the AX payload; type: " + typeUri
                        + " alias: " + alias);
 
         return alias;
@@ -310,7 +314,7 @@ public abstract class AxPayload extends AxMessage {
                     ! paramName.startsWith("value.") &&
                     ! paramName.equals("update_url"))
             {
-                _log.warn("Invalid parameter name in AX payload: " + paramName);
+                LOGGER.warn("Invalid parameter name in AX payload: " + paramName);
                 //return false;
             }
         }
@@ -329,7 +333,7 @@ public abstract class AxPayload extends AxMessage {
 
             if (! _parameters.hasParameter("type." + alias))
             {
-                _log.warn("Type missing for attribute alias: " + alias);
+                LOGGER.warn("Type missing for attribute alias: " + alias);
                 return false;
             }
 
@@ -337,7 +341,7 @@ public abstract class AxPayload extends AxMessage {
             {
                 if (_parameters.hasParameterPrefix("value." + alias + "."))
                 {
-                    _log.warn("Count parameter not present for alias: " + alias
+                    LOGGER.warn("Count parameter not present for alias: " + alias
                               + "; value." + alias + ".[index] format is not allowed.");
                     return false;
                 }
@@ -346,7 +350,7 @@ public abstract class AxPayload extends AxMessage {
             {
                 if (_parameters.hasParameter("value." + alias))
                 {
-                    _log.warn("Count parameter present for alias: " + alias
+                    LOGGER.warn("Count parameter present for alias: " + alias
                               + "; should use value." + alias + ".[index] format.");
                     return false;
                 }
@@ -355,7 +359,7 @@ public abstract class AxPayload extends AxMessage {
 
                 if (count < 0)
                 {
-                    _log.warn("Invalid value for count." + alias + ": " + count);
+                    LOGGER.warn("Invalid value for count." + alias + ": " + count);
                     return false;
                 }
 
@@ -364,7 +368,7 @@ public abstract class AxPayload extends AxMessage {
                     if (! _parameters.hasParameter("value." + alias + "." +
                             Integer.toString(i)))
                     {
-                        _log.warn("Value missing for alias: "
+                        LOGGER.warn("Value missing for alias: "
                                   + alias + "." + Integer.toString(i));
                         return false;
                     }
