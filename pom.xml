@@ -26,7 +26,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
-    <jetty.version>10.0.13</jetty.version>
+    <jetty.version>11.0.13</jetty.version>
     <test.data.src>${basedir}/src/test/yadisdata</test.data.src>
     <test.data.build>${basedir}/target/test-data</test.data.build>
     <test.servlet.port>0</test.servlet.port>
