@@ -8,12 +8,11 @@ import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.association.AssociationException;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Arrays;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * The OpenID Association Request message.
@@ -25,23 +24,19 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AssociationRequest extends Message
 {
-    private static Log _log = LogFactory.getLog(AssociationRequest.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssociationRequest.class);
 
     public static final String MODE_ASSOC = "associate";
 
-    protected final static List requiredFields = Arrays.asList( new String[] {
-            "openid.mode",
-            "openid.session_type",
-    });
+    protected final static List<String> requiredFields = Arrays.asList("openid.mode",
+            "openid.session_type");
 
-    protected final static List optionalFields = Arrays.asList( new String[] {
+    protected final static List<String> optionalFields = Arrays.asList(
             "openid.ns",                    // not in v1 messages
             "openid.assoc_type",            // can be missing in v1
             "openid.dh_modulus",
             "openid.dh_gen",
-            "openid.dh_consumer_public"
-    });
+            "openid.dh_consumer_public");
 
     /**
      * The Diffie-Hellman session containing the cryptografic data needed for
@@ -76,8 +71,8 @@ public class AssociationRequest extends Message
     protected AssociationRequest(AssociationSessionType type,
                                  DiffieHellmanSession dhSess)
     {
-        if (DEBUG)
-            _log.debug("Creating association request, type: " + type +
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Creating association request, type: " + type +
                        "DH session: " + dhSess);
 
         if (type.isVersion2())
@@ -137,7 +132,7 @@ public class AssociationRequest extends Message
 
         req.validate();
 
-        if (DEBUG) _log.debug("Created association request:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created association request:\n"
                               + req.keyValueFormEncoding());
 
         return req;
@@ -149,8 +144,8 @@ public class AssociationRequest extends Message
 
         req.validate();
 
-        if (DEBUG)
-            _log.debug("Created association request from message parameters:\n"
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created association request from message parameters:\n"
                        + req.keyValueFormEncoding());
 
         return req;

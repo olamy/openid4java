@@ -7,13 +7,14 @@ package org.openid4java.message.sreg;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Implements the extension for Simple Registration fetch requests.
@@ -23,15 +24,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SRegRequest extends SRegMessage
 {
-    private static Log _log = LogFactory.getLog(SRegRequest.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SRegRequest.class);
 
     /**
      * Constructs a SReg Request with an empty parameter list.
      */
     protected SRegRequest()
     {
-        if (DEBUG) _log.debug("Created empty SReg request.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty SReg request.");
     }
 
     /**
@@ -69,8 +69,8 @@ public class SRegRequest extends SRegMessage
         if (! req.isValid())
             throw new MessageException("Invalid parameters for a SReg request");
 
-        if (DEBUG)
-            _log.debug("Created SReg request from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created SReg request from parameter list:\n" + params);
 
         return req;
     }
@@ -102,7 +102,7 @@ public class SRegRequest extends SRegMessage
 
         _parameters.set(newParam);
 
-        if (DEBUG) _log.debug("Added new attribute to SReg request: " + attr +
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Added new attribute to SReg request: " + attr +
                               " required: " + required);
     }
 
@@ -124,9 +124,8 @@ public class SRegRequest extends SRegMessage
         if (param != null)
         {
             String[] values = param.getValue().split(",");
-            for (int i = 0; i < values.length; i++)
-            {
-                String attr = multivalDecode(values[i]);
+            for (String value : values) {
+                String attr = multivalDecode(value);
                 attributes.add(attr);
             }
         }
@@ -164,7 +163,7 @@ public class SRegRequest extends SRegMessage
             throw new MessageException("Invalid policy_url: " + policyUrl);
         }
 
-        if (DEBUG) _log.debug("Setting SReg request policy_url: " + policyUrl);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Setting SReg request policy_url: {}", policyUrl);
 
         _parameters.set(new Parameter("policy_url", policyUrl));
     }
@@ -190,7 +189,7 @@ public class SRegRequest extends SRegMessage
         if ( ! _parameters.hasParameter("required") &&
                 ! _parameters.hasParameter("optional") )
         {
-            _log.warn("One of 'required' or 'optional' parameters must be present.");
+            LOGGER.warn("One of 'required' or 'optional' parameters must be present.");
             return false;
         }
 
@@ -202,7 +201,7 @@ public class SRegRequest extends SRegMessage
                     ! paramName.equals("optional") &&
                     ! paramName.equals("policy_url"))
             {
-                _log.warn("Invalid parameter name in SReg request: " + paramName);
+                LOGGER.warn("Invalid parameter name in SReg request: " + paramName);
 //                return false;
             }
         }

@@ -18,7 +18,7 @@ public interface MessageExtensionFactory
     /**
      * Gets the extension type URI of the extension factory.
      */
-    public String getTypeUri();
+    String getTypeUri();
 
     /**
      * Builds a MessageExtension from a parameter list containing the
@@ -36,7 +36,7 @@ public interface MessageExtensionFactory
      * @return                  MessageExtension implementation for the supplied
      *                          extension parameters.
      */
-    public MessageExtension getExtension(
+    MessageExtension getExtension(
             ParameterList parameterList, boolean isRequest)
             throws MessageException;
 }

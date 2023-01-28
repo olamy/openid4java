@@ -7,14 +7,17 @@ package org.openid4java.server;
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
 
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * JDBC implementation for the ServerAssociationStore interface.
@@ -37,9 +40,7 @@ import org.apache.commons.logging.LogFactory;
 public class JdbcServerAssociationStore extends JdbcDaoSupport
         implements ServerAssociationStore
 {
-    private static Log _log = LogFactory.getLog(JdbcServerAssociationStore.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcServerAssociationStore.class);
     private static Random _random = new Random(System.currentTimeMillis());
 
     private static final int CLEANUP_INTERVAL = 60 * 1000; // 1 min in millis
@@ -98,8 +99,8 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
 
                 if (cnt == 1)
                 {
-                    if (DEBUG)
-                        _log.debug("Generated association, handle: " + handle +
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Generated association, handle: " + handle +
                                    " type: " + type +
                                    " expires in: " + expiryIn + " seconds.");
 
@@ -108,7 +109,7 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
             }
             catch (DataAccessException e)
             {
-                _log.error("Error generating association; attempts left: "
+                LOGGER.error("Error generating association; attempts left: "
                            + (attemptsLeft-1), e);
             }
 
@@ -153,26 +154,26 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
                 throw new AssociationException("Invalid association type " +
                         "retrieved from database: " + type);
 
-            if (DEBUG)
-                _log.debug("Retrieved association for handle: " + handle +
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Retrieved association for handle: " + handle +
                            " from table: " + _tableName);
 
             return assoc;
         }
         catch (AssociationException ase )
         {
-            _log.error("Error retrieving association from table: " + _tableName, ase);
+            LOGGER.error("Error retrieving association from table: " + _tableName, ase);
             return null;
         }
         catch (IncorrectResultSizeDataAccessException rse)
         {
-            _log.warn("Association not found for handle: " + handle +
+            LOGGER.warn("Association not found for handle: " + handle +
                       " in the table: " + _tableName);
             return null;
         }
         catch (DataAccessException dae)
         {
-            _log.error("Error retrieving association for handle: " + handle +
+            LOGGER.error("Error retrieving association for handle: " + handle +
                        "from table: " + _tableName, dae);
             return null;
         }
@@ -188,17 +189,17 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
 
             int cnt = jdbcTemplate.update(sql, new Object[] { handle } );
 
-            if (cnt == 1 && DEBUG)
-                _log.debug("Removed association, handle: " + handle +
+            if (cnt == 1 && LOGGER.isDebugEnabled())
+                LOGGER.debug("Removed association, handle: " + handle +
                            " from table: " + _tableName);
 
             if (cnt != 1)
-                _log.warn("Trying to remove handle: " + handle + " from table: "
+                LOGGER.warn("Trying to remove handle: " + handle + " from table: "
                           + _tableName + "; affected entries: " + cnt);
         }
         catch (Exception e)
         {
-            _log.error("Error removing association from table: " + _tableName, e);
+            LOGGER.error("Error removing association from table: " + _tableName, e);
         }
     }
 
@@ -216,14 +217,14 @@ public class JdbcServerAssociationStore extends JdbcDaoSupport
             Date now = new Date ( ) ;
             int cnt = jdbcTemplate.update(sql, new Object[] { now } );
 
-            _log.debug("Cleaned " + cnt + " expired associations from table: "
+            LOGGER.debug("Cleaned " + cnt + " expired associations from table: "
                           + _tableName);
 
             _lastCleanup = System.currentTimeMillis();
         }
     	catch (Exception e)
         {
-            _log.error("Error removing expired associations from table: " + _tableName, e);
+            LOGGER.error("Error removing expired associations from table: " + _tableName, e);
         }
     }
 }

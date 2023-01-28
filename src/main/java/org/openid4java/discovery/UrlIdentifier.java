@@ -4,39 +4,41 @@
 
 package org.openid4java.discovery;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.HashSet;
-import java.io.UnsupportedEncodingException;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class UrlIdentifier implements Identifier
 {
-    private static Log _log = LogFactory.getLog(UrlIdentifier.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
-    private static final Set UNRESERVED_CHARACTERS = new HashSet();
+    private static final Logger LOGGER = LoggerFactory.getLogger(UrlIdentifier.class);
+    private static final Set<Character> UNRESERVED_CHARACTERS = new HashSet<>();
 
     static
     {
         for (char c = 'a'; c <= 'z'; c++)
-            UNRESERVED_CHARACTERS.add(new Character(c));
+            UNRESERVED_CHARACTERS.add(c);
 
         for (char c = 'A'; c <= 'Z'; c++)
-            UNRESERVED_CHARACTERS.add(new Character(c));
+            UNRESERVED_CHARACTERS.add(c);
 
         for (char c = '0'; c <= '9'; c++)
-            UNRESERVED_CHARACTERS.add(new Character(c));
+            UNRESERVED_CHARACTERS.add(c);
 
-        UNRESERVED_CHARACTERS.add(new Character('-'));
-        UNRESERVED_CHARACTERS.add(new Character('.'));
-        UNRESERVED_CHARACTERS.add(new Character('_'));
-        UNRESERVED_CHARACTERS.add(new Character('~'));
+        UNRESERVED_CHARACTERS.add('-');
+        UNRESERVED_CHARACTERS.add('.');
+        UNRESERVED_CHARACTERS.add('_');
+        UNRESERVED_CHARACTERS.add('~');
     }
 
     private final URL _urlIdentifier;
@@ -153,15 +155,11 @@ public class UrlIdentifier implements Identifier
 
             URL normalized = new URL(protocol, host, port, file);
 
-            if (DEBUG) _log.debug("Normalized: " + text + " to: " + normalized);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Normalized: " + text + " to: " + normalized);
 
             return normalized;
         }
-        catch (MalformedURLException e)
-        {
-            throw new DiscoveryException("Invalid URL identifier", e);
-        }
-        catch (URISyntaxException e)
+        catch (MalformedURLException|URISyntaxException e)
         {
             throw new DiscoveryException("Invalid URL identifier", e);
         }
@@ -182,7 +180,7 @@ public class UrlIdentifier implements Identifier
             return null;
 
         int len = text.length();
-        StringBuffer normalized = new StringBuffer(len);
+        StringBuilder normalized = new StringBuilder(len);
 
         for (int i = 0; i < len; i++)
         {
@@ -192,20 +190,13 @@ public class UrlIdentifier implements Identifier
             {
                 String percentCode = text.substring(i, i + 3).toUpperCase();
 
-                try
-                {
-                    String str = URLDecoder.decode(percentCode, "ISO-8859-1");
-                    char chr = str.charAt(0);
+                String str = URLDecoder.decode(percentCode, StandardCharsets.ISO_8859_1);
+                char chr = str.charAt(0);
 
-                    if (UNRESERVED_CHARACTERS.contains(new Character(chr)))
-                        normalized.append(chr);
-                    else
-                        normalized.append(percentCode);
-                }
-                catch (UnsupportedEncodingException e)
-                {
+                if (UNRESERVED_CHARACTERS.contains(chr))
+                    normalized.append(chr);
+                else
                     normalized.append(percentCode);
-                }
 
                 i += 2;
             }

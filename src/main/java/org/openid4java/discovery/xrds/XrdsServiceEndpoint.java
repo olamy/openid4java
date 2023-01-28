@@ -1,7 +1,6 @@
 package org.openid4java.discovery.xrds;
 
 import java.util.Set;
-import java.util.Arrays;
 
 /**
  * Encapsulates the (OpenID-related) information extracted in

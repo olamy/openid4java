@@ -4,12 +4,12 @@
 
 package org.openid4java.server;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.discovery.Discovery;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.yadis.YadisResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -23,8 +23,7 @@ import java.net.MalformedURLException;
  */
 public class RealmVerifier
 {
-    private static Log _log = LogFactory.getLog(RealmVerifier.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(RealmVerifier.class);
 
     public static final int OK = 0;
     public static final int DENIED_REALM = 1;
@@ -108,7 +107,7 @@ public class RealmVerifier
     {
         this._enforceRpId = enforceRpId;
         if (! enforceRpId)
-            _log.warn("RP discovery / realm validation disabled; ");
+            LOGGER.warn("RP discovery / realm validation disabled; ");
     }
 
     public int validate(String realm, String returnTo)
@@ -133,7 +132,7 @@ public class RealmVerifier
 
         if (OK != result)
         {
-            _log.error("Return URL: " + returnTo +
+            LOGGER.error("Return URL: " + returnTo +
                        " does not match realm: " + realm);
             return result;
         }
@@ -143,12 +142,12 @@ public class RealmVerifier
         {
             result = validateRpId(realm, returnTo);
             if (OK != result)
-                _log.error("Failed to validate return URL: " + returnTo +
+                LOGGER.error("Failed to validate return URL: " + returnTo +
                     " against endpoints discovered from the RP's realm.");
         }
         else if ( ! compatibility && ! enforceRpId && _isOP)
         {
-            _log.warn("RP discovery / realm validation disabled; " +
+            LOGGER.warn("RP discovery / realm validation disabled; " +
                       "this option SHOULD be enabled for OPs");
         }
 
@@ -177,14 +176,14 @@ public class RealmVerifier
 
                 if (endpoint.getOPEndpoint().getAuthority().startsWith("*."))
                 {
-                    _log.warn("Wildcard not allowed in discovered " +
+                    LOGGER.warn("Wildcard not allowed in discovered " +
                               "RP endpoints; found: " + endpointUrl);
                     continue;
                 }
 
                 if (OK == match(endpointUrl, returnTo))
                 {
-                    _log.info("Return URL: " + returnTo +
+                    LOGGER.info("Return URL: " + returnTo +
                              " matched discovered RP endpoint: " + endpointUrl);
                     result = OK;
                     break;
@@ -194,15 +193,15 @@ public class RealmVerifier
         catch (DiscoveryException e)
         {
             if (_enforceRpId)
-                _log.error("Discovery failed on realm: " + realm, e);
+                LOGGER.error("Discovery failed on realm: " + realm, e);
             else
-                _log.warn("Discovery failed on realm: " + realm, e);
+                LOGGER.warn("Discovery failed on realm: " + realm, e);
 
             result = RP_DISCOVERY_FAILED;
         }
         catch (MalformedURLException e)
         {
-            _log.error("Invalid realm URL: " + realm, e);
+            LOGGER.error("Invalid realm URL: " + realm, e);
             result = MALFORMED_REALM;
         }
 
@@ -211,7 +210,7 @@ public class RealmVerifier
 
     public int match(String realm, String returnTo)
     {
-        if (DEBUG) _log.debug("Verifying realm: " + realm +
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Verifying realm: " + realm +
                               " on return URL: " + returnTo);
 
         URL realmUrl;
@@ -221,7 +220,7 @@ public class RealmVerifier
         }
         catch (MalformedURLException e)
         {
-            _log.error("Invalid realm URL: " + realm, e);
+            LOGGER.error("Invalid realm URL: " + realm, e);
             return MALFORMED_REALM;
         }
 
@@ -229,7 +228,7 @@ public class RealmVerifier
 
         if (isDeniedRealmDomain(realmDomain))
         {
-            _log.warn("Blacklisted realm domain: " + realmDomain);
+            LOGGER.warn("Blacklisted realm domain: " + realmDomain);
             return DENIED_REALM;
         }
 
@@ -240,46 +239,41 @@ public class RealmVerifier
         }
         catch (MalformedURLException e)
         {
-            _log.error("Invalid return URL: " + returnTo);
+            LOGGER.error("Invalid return URL: " + returnTo);
             return MALFORMED_RETURN_TO_URL;
         }
 
         if (realmUrl.getRef() != null)
         {
-            if (DEBUG) _log.debug("Realm verification failed: " +
-                                  "URL fragments are not allowed.");
+            LOGGER.debug("Realm verification failed: URL fragments are not allowed.");
             return FRAGMENT_NOT_ALLOWED;
         }
 
         if (!realmUrl.getProtocol().equalsIgnoreCase(returnToUrl.getProtocol()))
         {
-            if (DEBUG) _log.debug("Realm verification failed: " +
-                                  "protocol mismatch.");
+            LOGGER.debug("Realm verification failed: protocol mismatch.");
             return PROTOCOL_MISMATCH;
         }
 
         if (!domainMatch(realmDomain, returnToUrl.getHost()))
         {
-            if (DEBUG) _log.debug("Realm verification failed: " +
-                                  "domain mismatch.");
+            LOGGER.debug("Realm verification failed: domain mismatch.");
             return DOMAIN_MISMATCH;
         }
 
         if (!portMatch(realmUrl, returnToUrl))
         {
-            if (DEBUG) _log.debug("Realm verification failed: " +
-                                  "port mismatch.");
+            LOGGER.debug("Realm verification failed: port mismatch.");
             return PORT_MISMATCH;
         }
 
         if (!pathMatch(realmUrl, returnToUrl))
         {
-            if (DEBUG) _log.debug("Realm verification failed: " +
-                                  "path mismatch.");
+            LOGGER.debug("Realm verification failed: path mismatch.");
             return PATH_MISMATCH;
         }
 
-        _log.info("Return URL: " + returnTo + " matches realm: " + realm);
+        LOGGER.info("Return URL: " + returnTo + " matches realm: " + realm);
 
         return OK;
     }

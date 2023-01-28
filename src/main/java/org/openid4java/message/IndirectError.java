@@ -4,17 +4,16 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class IndirectError extends Message
 {
-    private static Log _log = LogFactory.getLog(IndirectError.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndirectError.class);
 
     protected IndirectError(String msg, String returnTo)
     {
@@ -80,11 +79,11 @@ public class IndirectError extends Message
         }
         catch (MessageException ex)
         {
-            _log.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
+            LOGGER.error("Invalid " + (compatibility? "OpenID1" : "OpenID2") +
                        " indirect error message created for message: " + msg);
         }
 
-        _log.debug("Created indirect error message:\n" + err.keyValueFormEncoding());
+        LOGGER.debug("Created indirect error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }
@@ -99,11 +98,11 @@ public class IndirectError extends Message
         }
         catch (MessageException e)
         {
-            _log.error("Invalid direct error message created: "
+            LOGGER.error("Invalid direct error message created: "
                        + err.keyValueFormEncoding() );
         }
 
-        _log.debug("Created indirect error message:\n" + err.keyValueFormEncoding());
+        LOGGER.debug("Created indirect error message:\n" + err.keyValueFormEncoding());
 
         return err;
     }

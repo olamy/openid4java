@@ -9,5 +9,5 @@ package org.openid4java.server;
  */
 public interface NonceGenerator
 {
-    public String next();
+    String next();
 }

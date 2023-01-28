@@ -7,8 +7,8 @@ package org.openid4java.infocard;
 import org.openid4java.message.Message;
 import org.openid4java.message.ParameterList;
 import org.openid4java.OpenIDException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -29,9 +29,8 @@ import java.io.IOException;
  */
 public class OpenIDToken
 {
-    private static Log _log = LogFactory.getLog(OpenIDToken.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-             
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenIDToken.class);
+
     /**
      * Token type data structure.
      */
@@ -53,8 +52,8 @@ public class OpenIDToken
     {
         setOpenIDMessage(openidMessage);
 
-        if (DEBUG)
-            _log.debug("Created " + _tokenType +" token");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created {} token", _tokenType);
     }
 
     /**
@@ -70,8 +69,8 @@ public class OpenIDToken
         if (xmlToken == null)
             throw new InfocardException("Error processing xmlToken: null value");
 
-        if (DEBUG)
-            _log.debug("Processing xmlToken: " + xmlToken);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Processing xmlToken: {}", xmlToken);
 
         try
         {

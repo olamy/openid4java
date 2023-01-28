@@ -4,28 +4,22 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class AuthFailure extends Message
 {
-    private static Log _log = LogFactory.getLog(AuthFailure.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthFailure.class);
 
-    protected final static List requiredFields = Arrays.asList( new String[] {
-            "openid.mode"
-    });
+    protected final static List<String> requiredFields = List.of("openid.mode");
 
-    protected final static List optionalFields = Arrays.asList( new String[] {
-            "openid.ns"
-    });
+    protected final static List<String> optionalFields = List.of("openid.ns");
 
     public AuthFailure(boolean compatibility, String returnTo)
     {
@@ -49,8 +43,8 @@ public class AuthFailure extends Message
 
         fail.validate();
 
-        if (DEBUG)
-            _log.debug("Retrieved auth failure from message parameters:\n"
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Retrieved auth failure from message parameters:\n"
                        + fail.keyValueFormEncoding());
 
         return fail;

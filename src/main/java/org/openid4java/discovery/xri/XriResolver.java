@@ -19,7 +19,7 @@ public interface XriResolver
      *              priority.
      * @throws DiscoveryException if discovery failed.
      */
-    public List discover(XriIdentifier xri) throws DiscoveryException;
+    List discover(XriIdentifier xri) throws DiscoveryException;
 
     XriIdentifier parseIdentifier(String identifier) throws DiscoveryException;
 }

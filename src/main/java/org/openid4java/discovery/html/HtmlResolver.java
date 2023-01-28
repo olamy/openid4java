@@ -6,8 +6,6 @@ package org.openid4java.discovery.html;
 
 import com.google.inject.Inject;
 import org.apache.http.HttpStatus;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,21 +14,21 @@ import java.util.ArrayList;
 import org.openid4java.discovery.UrlIdentifier;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
-import org.openid4java.util.HttpCache;
 import org.openid4java.util.HttpFetcher;
 import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.OpenID4JavaUtils;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu, Sutra Zhou
  */
 public class HtmlResolver
 {
-    private static Log _log = LogFactory.getLog(HtmlResolver.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlResolver.class);
 
     private static final String HTML_PARSER_CLASS_NAME_KEY = "discovery.html.parser";
     private static final HtmlParser HTML_PARSER;
@@ -39,7 +37,7 @@ public class HtmlResolver
 
     static {
         String className = OpenID4JavaUtils.getProperty(HTML_PARSER_CLASS_NAME_KEY);
-        if (DEBUG) _log.debug(HTML_PARSER_CLASS_NAME_KEY + ":" + className);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug(HTML_PARSER_CLASS_NAME_KEY + ":" + className);
         try
         {
             HTML_PARSER = (HtmlParser) Class.forName(className).newInstance();
@@ -133,7 +131,7 @@ public class HtmlResolver
                     OpenIDException.DISCOVERY_HTML_GET_ERROR, e);
         }
 
-        _log.info("HTML discovery completed on: " + identifier);
+        LOGGER.info("HTML discovery completed on: " + identifier);
 
         return extractDiscoveryInformation(result);
     }
@@ -158,8 +156,8 @@ public class HtmlResolver
                         htmlResult.getDelegate2(),
                         DiscoveryInformation.OPENID2);
 
-            if (DEBUG)
-                _log.debug("OpenID2-signon HTML discovery endpoint: " + extracted);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("OpenID2-signon HTML discovery endpoint: " + extracted);
 
             htmlList.add(extracted);
         }
@@ -172,8 +170,8 @@ public class HtmlResolver
                         htmlResult.getDelegate1(),
                         DiscoveryInformation.OPENID11);
 
-            if (DEBUG)
-                _log.debug("OpenID1-signon HTML discovery endpoint: " + extracted);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("OpenID1-signon HTML discovery endpoint: " + extracted);
 
             htmlList.add(extracted);
         }

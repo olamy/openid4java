@@ -33,14 +33,14 @@ public interface HttpFetcher {
    * not return a clone, so manipulating the object returned here will
    * manipulate the {@link HttpRequestOptions} used by the {@link HttpFetcher}.
    */
-  public HttpRequestOptions getDefaultRequestOptions();
+  HttpRequestOptions getDefaultRequestOptions();
 
   /**
    * Gets a clone of the default HttpRequestOptions.
    */
-  public HttpRequestOptions getRequestOptions();
+  HttpRequestOptions getRequestOptions();
 
-  public void setDefaultRequestOptions(HttpRequestOptions defaultOptions);
+  void setDefaultRequestOptions(HttpRequestOptions defaultOptions);
 
   /**
    * GETs a HTTP URL. A cached copy will be returned if one exists.
@@ -50,7 +50,7 @@ public interface HttpFetcher {
    *
    * @see HttpResponse
    */
-  public HttpResponse get(String url) throws IOException;
+  HttpResponse get(String url) throws IOException;
 
   /**
    * GETs a HTTP URL. A cached copy will be returned if one exists and the
@@ -61,15 +61,15 @@ public interface HttpFetcher {
    *
    * @see HttpRequestOptions
    */
-  public HttpResponse get(String url, HttpRequestOptions requestOptions) throws IOException;
+  HttpResponse get(String url, HttpRequestOptions requestOptions) throws IOException;
 
-  public HttpResponse head(String url) throws IOException;
+  HttpResponse head(String url) throws IOException;
 
-  public HttpResponse head(String url, HttpRequestOptions requestOptions) throws IOException;
+  HttpResponse head(String url, HttpRequestOptions requestOptions) throws IOException;
 
-  public HttpResponse post(String url, Map<String, String> parameters) throws IOException;
+  HttpResponse post(String url, Map<String, String> parameters) throws IOException;
 
-  public HttpResponse post(String url, Map<String, String> parameters,
+  HttpResponse post(String url, Map<String, String> parameters,
       HttpRequestOptions requestOptions) throws IOException;
 
 }

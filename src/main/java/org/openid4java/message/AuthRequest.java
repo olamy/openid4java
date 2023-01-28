@@ -4,11 +4,11 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
 import org.openid4java.server.RealmVerifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,8 +21,7 @@ import java.util.List;
  */
 public class AuthRequest extends Message
 {
-    private static Log _log = LogFactory.getLog(AuthRequest.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthRequest.class);
 
     public static final String MODE_SETUP = "checkid_setup";
     public static final String MODE_IMMEDIATE = "checkid_immediate";
@@ -99,7 +98,7 @@ public class AuthRequest extends Message
 
         req.validate();
 
-        if (DEBUG) _log.debug("Created auth request:\n" + req.keyValueFormEncoding());
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created auth request:\n" + req.keyValueFormEncoding());
 
         return req;
     }
@@ -114,7 +113,7 @@ public class AuthRequest extends Message
 
         req.validate();
 
-        if (DEBUG) _log.debug("Created auth request:\n" + req.keyValueFormEncoding());
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created auth request:\n" + req.keyValueFormEncoding());
 
         return req;
     }
@@ -139,8 +138,8 @@ public class AuthRequest extends Message
     {
         set("openid.mode", immediate ? MODE_IMMEDIATE : MODE_SETUP);
 
-        if (DEBUG && immediate)
-            _log.debug("Setting checkid_immediate auth request.");
+        if (LOGGER.isDebugEnabled() && immediate)
+            LOGGER.debug("Setting checkid_immediate auth request.");
     }
 
     public boolean isImmediate()
@@ -277,12 +276,12 @@ public class AuthRequest extends Message
 
         if ( compatibility && hasParameter("openid.realm") )
         {
-            _log.warn("openid.realm should not be present in OpenID1 auth requests");
+            LOGGER.warn("openid.realm should not be present in OpenID1 auth requests");
         }
 
         if ( !compatibility && hasParameter("openid.trust_root") )
         {
-            _log.warn("openid.trust_root should not be present in OpenID2 auth requests.");
+            LOGGER.warn("openid.trust_root should not be present in OpenID2 auth requests.");
         }
 
         // figure out if 'claimed_id' and 'identity' are optional

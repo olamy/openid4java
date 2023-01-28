@@ -6,11 +6,8 @@ package org.openid4java.discovery.yadis;
 
 import com.google.inject.Inject;
 
-import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
 import org.apache.http.Header;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
@@ -22,13 +19,13 @@ import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.xrds.XrdsParser;
-import org.openid4java.util.HttpCache;
 import org.openid4java.util.HttpFetcher;
 import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
 import org.openid4java.util.OpenID4JavaUtils;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -55,8 +52,7 @@ import org.openid4java.util.OpenID4JavaUtils;
  */
 public class YadisResolver
 {
-    private static Log _log = LogFactory.getLog(YadisResolver.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(YadisResolver.class);
 
     // Yadis constants
     public static final String YADIS_XRDS_LOCATION = "X-XRDS-Location";
@@ -73,7 +69,7 @@ public class YadisResolver
 
     static {
         String className = OpenID4JavaUtils.getProperty(YADIS_HTML_PARSER_CLASS_NAME_KEY);
-        if (DEBUG) _log.debug(YADIS_HTML_PARSER_CLASS_NAME_KEY + ":" + className);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug(YADIS_HTML_PARSER_CLASS_NAME_KEY + ":" + className);
         try
         {
             YADIS_HTML_PARSER = (YadisHtmlParser) Class.forName(className).newInstance();
@@ -83,7 +79,7 @@ public class YadisResolver
             throw new RuntimeException(e);
         }
         className = OpenID4JavaUtils.getProperty(XRDS_PARSER_CLASS_NAME_KEY);
-        if (DEBUG) _log.debug(XRDS_PARSER_CLASS_NAME_KEY + ":" + className);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug(XRDS_PARSER_CLASS_NAME_KEY + ":" + className);
         try
         {
             XRDS_PARSER = (XrdsParser) Class.forName(className).newInstance();
@@ -261,7 +257,7 @@ public class YadisResolver
             result.setXrdsLocation(url, OpenIDException.YADIS_INVALID_URL);
         }
 
-        _log.info("Yadis discovered " + result.getEndpointCount() + " endpoints from: " + url);
+        LOGGER.info("Yadis discovered " + result.getEndpointCount() + " endpoints from: " + url);
         return result;
     }
 
@@ -271,7 +267,6 @@ public class YadisResolver
      *
      * @param result        The YadisResult object containing a valid XRDS location.
      *                      It will be further populated with the Yadis discovery results.
-     * @param cache        The HttpClient object to use for placing the call
      * @param maxRedirects
      */
     private void retrieveXrdsDocument(YadisResult result, int maxRedirects, Set serviceTypes)
@@ -323,10 +318,10 @@ public class YadisResolver
                     OpenIDException.YADIS_HTMLMETA_DOWNLOAD_ERROR);
 
         xrdsLocation = YADIS_HTML_PARSER.getHtmlMeta(input);
-        if (DEBUG)
+        if (LOGGER.isDebugEnabled())
         {
-            _log.debug("input:\n" + input);
-            _log.debug("xrdsLocation: " + xrdsLocation);
+            LOGGER.debug("input:\n" + input);
+            LOGGER.debug("xrdsLocation: " + xrdsLocation);
         }
         return xrdsLocation;
     }
@@ -358,8 +353,7 @@ public class YadisResolver
      *          </ul>
      */
 
-    private YadisResult retrieveXrdsLocation(
-        YadisUrl url, boolean useGet, int maxRedirects, Set serviceTypes)
+    private YadisResult retrieveXrdsLocation(YadisUrl url, boolean useGet, int maxRedirects, Set serviceTypes)
         throws DiscoveryException
     {
 
@@ -381,7 +375,7 @@ public class YadisResolver
             {
                 result.setYadisUrl(url);
 
-                if (DEBUG) _log.debug(
+                if (LOGGER.isDebugEnabled()) LOGGER.debug(
                     "Performing HTTP " + (useGet ? "GET" : "HEAD") +
                     " on: " + url + " ...");
 
@@ -412,8 +406,8 @@ public class YadisResolver
                             resp.getStatusCode(), OpenIDException.YADIS_GET_ERROR);
 
                     // HEAD is optional, will fall-back to GET
-                    if (DEBUG)
-                        _log.debug("Cannot retrieve " + YADIS_XRDS_LOCATION +
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Cannot retrieve " + YADIS_XRDS_LOCATION +
                             " using HEAD from " + url.getUrl().toString() +
                             "; status=" + resp.getStatusCode());
                 }

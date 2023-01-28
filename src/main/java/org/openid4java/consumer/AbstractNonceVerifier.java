@@ -9,16 +9,15 @@ import org.openid4java.util.InternetDateFormat;
 import java.util.Date;
 import java.text.ParseException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public abstract class AbstractNonceVerifier implements NonceVerifier
 {
-    private static Log _log = LogFactory.getLog(AbstractNonceVerifier.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static Logger LOGGER = LoggerFactory.getLogger(AbstractNonceVerifier.class);
 
     protected static InternetDateFormat _dateFormat = new InternetDateFormat();
 
@@ -47,7 +46,7 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
      */
     public synchronized int seen(String opUrl, String nonce)
     {
-        if (DEBUG) _log.debug("Verifying nonce: " + nonce);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Verifying nonce: " + nonce);
 
         Date now = new Date();
 
@@ -57,7 +56,7 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
 
             if (isTooOld(now, nonceDate))
             {
-                _log.warn("Nonce is too old: " + nonce);
+                LOGGER.warn("Nonce is too old: {}", nonce);
                 return TOO_OLD;
             }
 
@@ -65,7 +64,7 @@ public abstract class AbstractNonceVerifier implements NonceVerifier
         }
         catch (ParseException e)
         {
-            _log.error("Error verifying the nonce: " + nonce, e);
+            LOGGER.error("Error verifying the nonce: " + nonce, e);
             return INVALID_TIMESTAMP;
         }
     }

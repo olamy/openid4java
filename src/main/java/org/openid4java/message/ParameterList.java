@@ -4,14 +4,19 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.net.URLDecoder;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * A list of parameters that are part of an OpenID message. Please note that you can have multiple parameters with
@@ -21,8 +26,7 @@ import java.net.URLDecoder;
  */
 public class ParameterList implements Serializable
 {
-    private static Log _log = LogFactory.getLog(ParameterList.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParameterList.class);
 
     Map _parameterMap;
 
@@ -30,12 +34,12 @@ public class ParameterList implements Serializable
     {
         _parameterMap  = new LinkedHashMap();
 
-        if (DEBUG) _log.debug("Created empty parameter list.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty parameter list.");
     }
 
     public ParameterList(ParameterList that)
     {
-        if (DEBUG) _log.debug("Cloning parameter list:\n" + that);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Cloning parameter list:\n {}", that);
 
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
@@ -74,19 +78,19 @@ public class ParameterList implements Serializable
             else
             {
                 value="";
-                _log.error("Can extract parameter value; unexpected type: " +
+                LOGGER.error("Can extract parameter value; unexpected type: " +
                     v.getClass().getName());
             }
 
             set(new Parameter(name, value));
         }
 
-        if (DEBUG) _log.debug("Creating parameter list:\n" + this);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Creating parameter list:\n" + this);
     }
 
     public void copyOf(ParameterList that)
     {
-        if (DEBUG) _log.debug("Copying parameter list:\n" + that);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Copying parameter list:\n" + that);
 
         this._parameterMap = new LinkedHashMap(that._parameterMap);
     }
@@ -164,7 +168,7 @@ public class ParameterList implements Serializable
      */
     public static ParameterList createFromQueryString(String queryString) throws MessageException
     {
-        if (DEBUG) _log.debug("Creating parameter list from query string: " + queryString);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Creating parameter list from query string: " + queryString);
 
         ParameterList parameterList = new ParameterList();
 
@@ -195,7 +199,7 @@ public class ParameterList implements Serializable
 
     public static ParameterList createFromKeyValueForm(String keyValueForm) throws MessageException
     {
-        if (DEBUG) _log.debug("Creating parameter list from key-value form:\n" + keyValueForm);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Creating parameter list from key-value form:\n" + keyValueForm);
 
         ParameterList parameterList = new ParameterList();
 

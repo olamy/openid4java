@@ -4,24 +4,29 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.pape.PapeMessage;
 import org.openid4java.message.sreg.SReg11ExtensionFactory;
 import org.openid4java.message.sreg.SRegMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class Message
 {
-    private static Log _log = LogFactory.getLog(Message.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Message.class);
 
     // message constants
     public static final String MODE_IDRES = "id_res";
@@ -102,7 +107,7 @@ public class Message
 
         message.validate();
 
-        if (DEBUG) _log.debug("Created message:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created message:\n"
                               + message.keyValueFormEncoding());
 
         return message;
@@ -115,7 +120,7 @@ public class Message
 
         message.validate();
 
-        if (DEBUG) _log.debug("Created message from parameter list:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created message from parameter list:\n"
                               + message.keyValueFormEncoding());
 
         return message;
@@ -278,7 +283,7 @@ public class Message
             MessageExtensionFactory extensionFactory =
                     (MessageExtensionFactory) clazz.newInstance();
 
-            if (DEBUG) _log.debug("Adding extension factory for " +
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Adding extension factory for " +
                                   extensionFactory.getTypeUri());
 
             _extensionFactories.put(extensionFactory.getTypeUri(), clazz);
@@ -323,7 +328,7 @@ public class Message
         }
         catch (Exception e)
         {
-            _log.error("Error getting extension factory for " + typeUri);
+            LOGGER.error("Error getting extension factory for " + typeUri);
             return null;
         }
 
@@ -416,7 +421,7 @@ public class Message
 
         _extAliases.put(typeUri, alias);
 
-        if (DEBUG) _log.debug("Adding extension; type URI: "
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Adding extension; type URI: "
                               + typeUri + " alias: " +alias);
 
         //if (hasParameter("openid.ns"))
@@ -539,7 +544,7 @@ public class Message
                 throw new MessageException("Cannot instantiate extension: " + typeUri);
         }
 
-        if (DEBUG) _log.debug("Extracting " + typeUri +" extension from message...");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Extracting " + typeUri +" extension from message...");
 
         return (MessageExtension) _extesion.get(typeUri);
     }

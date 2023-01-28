@@ -4,8 +4,6 @@
 
 package org.openid4java.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -17,6 +15,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.AllClientPNames;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +39,7 @@ import javax.net.ssl.SSLContext;
  */
 public class HttpCache extends AbstractHttpFetcher
 {
-    private static Log _log = LogFactory.getLog(HttpCache.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpCache.class);
 
     /**
      * HttpClient used to place the HTTP requests.
@@ -95,11 +94,11 @@ public class HttpCache extends AbstractHttpFetcher
     {
         if (_getCache.keySet().contains(url))
         {
-            _log.info("Removing cached GET response for " + url);
+            LOGGER.info("Removing cached GET response for " + url);
             _getCache.remove(url);
         }
         else
-            _log.info("NOT removing cached GET for " + url + " NOT FOUND.");
+            LOGGER.info("NOT removing cached GET for " + url + " NOT FOUND.");
     }
 
     /* (non-Javadoc)
@@ -114,11 +113,11 @@ public class HttpCache extends AbstractHttpFetcher
         {
             if (match(resp, requestOptions))
             {
-                _log.info("Returning cached GET response for " + url);
+                LOGGER.info("Returning cached GET response for " + url);
                 return resp;
             } else
             {
-                _log.info("Removing cached GET for " + url);
+                LOGGER.info("Removing cached GET for " + url);
                 removeGet(url);
             }
         }
@@ -186,7 +185,7 @@ public class HttpCache extends AbstractHttpFetcher
           post.setEntity(new UrlEncodedFormEntity(toList(parameters), "UTF-8"));
 
           // place the http call to the OP
-          if (DEBUG) _log.debug("Performing HTTP POST on " + url);
+          if (LOGGER.isDebugEnabled()) LOGGER.debug("Performing HTTP POST on {}", url);
           httpResponse = _client.execute(post);
           int statusCode = httpResponse.getStatusLine().getStatusCode();
           String statusLine = httpResponse.getStatusLine().getReasonPhrase();
@@ -241,7 +240,7 @@ public class HttpCache extends AbstractHttpFetcher
 
       httpBodyInput.close();
 
-      if (DEBUG) _log.debug("Read " + totalRead + " bytes.");
+      if (LOGGER.isDebugEnabled()) LOGGER.debug("Read " + totalRead + " bytes.");
 
       return new ResponseBody(new String(data, 0, totalRead), bodySizeExceeded);
     }
@@ -251,7 +250,7 @@ public class HttpCache extends AbstractHttpFetcher
         // use cache?
         if ( resp != null && ! requestOptions.isUseCache())
         {
-            _log.info("Explicit fresh GET requested; removing cached copy");
+            LOGGER.info("Explicit fresh GET requested; removing cached copy");
             return false;
         }
 
@@ -266,7 +265,7 @@ public class HttpCache extends AbstractHttpFetcher
             {
 
                 String cacheExpTimeStr = (new Date(cacheExpTime)).toString();
-                _log.info("Cache Expired at " + cacheExpTimeStr + "; removing cached copy");
+                LOGGER.info("Cache Expired at " + cacheExpTimeStr + "; removing cached copy");
                 return false;
         		
     	    }
@@ -282,7 +281,7 @@ public class HttpCache extends AbstractHttpFetcher
                  !responseContentType.getValue().split(";")[0]
                      .equalsIgnoreCase(requiredContentType) )
             {
-                _log.info("Cached GET response does not match " +
+                LOGGER.info("Cached GET response does not match " +
                     "the required content type, removing.");
                 return false;
             }
@@ -291,7 +290,7 @@ public class HttpCache extends AbstractHttpFetcher
         if (resp != null &&
             resp.getMaxRedirectsFollowed() > requestOptions.getMaxRedirects())
         {
-            _log.info("Cached GET response used " +
+            LOGGER.info("Cached GET response used " +
                       resp.getMaxRedirectsFollowed() +
                       " max redirects; current requirement is: " +
                       requestOptions.getMaxRedirects());
@@ -313,11 +312,11 @@ public class HttpCache extends AbstractHttpFetcher
         {
             if (match(resp, requestOptions))
             {
-                _log.info("Returning cached HEAD response for " + url);
+                LOGGER.info("Returning cached HEAD response for " + url);
                 return resp;
             } else
             {
-                _log.info("Removing cached HEAD for " + url);
+                LOGGER.info("Removing cached HEAD for " + url);
                 removeGet(url);
             }
         }

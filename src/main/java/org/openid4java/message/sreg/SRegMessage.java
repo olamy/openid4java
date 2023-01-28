@@ -4,9 +4,12 @@
 
 package org.openid4java.message.sreg;
 
-import org.openid4java.message.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.openid4java.message.MessageException;
+import org.openid4java.message.MessageExtension;
+import org.openid4java.message.MessageExtensionFactory;
+import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for the Simple Registration implementation.
@@ -39,13 +42,12 @@ import org.apache.commons.logging.LogFactory;
  * OpenID 2 messages / SREG1.1</li>
  * </ul>
  *
- * @see Message MessageExtension
+ * @see org.openid4java.message.Message MessageExtension
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class SRegMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Log _log = LogFactory.getLog(SRegMessage.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SRegMessage.class);
 
     /**
      * The Simple Registration 1.0 namespace URI.
@@ -74,7 +76,7 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
     {
         _parameters = new ParameterList();
 
-        if (DEBUG) _log.debug("Created empty SRegMessage.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty SRegMessage.");
     }
 
     /**
@@ -88,8 +90,8 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
     {
         _parameters = params;
 
-        if (DEBUG)
-            _log.debug("Created SRegMessage from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created SRegMessage from parameter list:\n {}", params);
     }
 
     /**
@@ -120,7 +122,7 @@ public class SRegMessage implements MessageExtension, MessageExtensionFactory
      * The openid.ns.extension_type_uri parameter is also handled by
      * the Message class.
      *
-     * @see Message
+     * @see org.openid4java.message.Message
      */
     public ParameterList getParameters()
     {

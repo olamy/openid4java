@@ -9,12 +9,15 @@ import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.util.InternetDateFormat;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
 import java.text.ParseException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Implements the extension for OpenID Provider Authentication Policy responses.
@@ -23,12 +26,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PapeResponse extends PapeMessage
 {
-    private static Log _log = LogFactory.getLog(PapeResponse.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(PapeResponse.class);
+    private static final boolean DEBUG = LOGGER.isDebugEnabled();
 
-    protected final static List PAPE_FIELDS = Arrays.asList( new String[] {
-            "auth_policies", "auth_time",
-    });
+    protected final static List<String> PAPE_FIELDS = Arrays.asList("auth_policies", "auth_time");
 
     private static final String AUTH_POLICY_NONE = "http://schemas.openid.net/pape/policies/2007/06/none";
 
@@ -41,7 +42,7 @@ public class PapeResponse extends PapeMessage
     {
         set("auth_policies", AUTH_POLICY_NONE);
 
-        if (DEBUG) _log.debug("Created empty PAPE response.");
+        if (DEBUG) LOGGER.debug("Created empty PAPE response.");
     }
 
     /**
@@ -72,7 +73,7 @@ public class PapeResponse extends PapeMessage
         resp.validate();
 
         if (DEBUG)
-            _log.debug("Created PAPE response from parameter list:\n" + params);
+            LOGGER.debug("Created PAPE response from parameter list:\n" + params);
 
         return resp;
     }
@@ -184,7 +185,7 @@ public class PapeResponse extends PapeMessage
             }
             catch (ParseException e)
             {
-                _log.warn("Invalid auth_time: " + authTime + 
+                LOGGER.warn("Invalid auth_time: " + authTime + 
                           "; returning null.");
             }
         }
@@ -232,7 +233,7 @@ public class PapeResponse extends PapeMessage
                 continue;
 
             if ( paramName.startsWith(AUTH_LEVEL_PREFIX) &&
-                 (authLevelAliases.values().contains(paramName.substring(AUTH_LEVEL_PREFIX.length()))))
+                 (authLevelAliases.containsValue(paramName.substring(AUTH_LEVEL_PREFIX.length()))))
                 continue;
 
             throw new MessageException(

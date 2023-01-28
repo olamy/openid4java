@@ -4,9 +4,13 @@
 
 package org.openid4java.message.pape;
 
-import org.openid4java.message.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.openid4java.message.MessageException;
+import org.openid4java.message.MessageExtension;
+import org.openid4java.message.MessageExtensionFactory;
+import org.openid4java.message.Parameter;
+import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -24,13 +28,12 @@ import java.util.Iterator;
  * openid.extension_alias prefix removed
  * </ul>
  *
- * @see Message MessageExtension
+ * @see org.openid4java.message.Message MessageExtension
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class PapeMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Log _log = LogFactory.getLog(PapeMessage.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(PapeMessage.class);
 
     public static final String PAPE_POLICY_PHISHING_RESISTANT =
         "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant";
@@ -66,7 +69,7 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
     {
         _parameters = new ParameterList();
 
-        if (DEBUG) _log.debug("Created empty PapeMessage.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty PapeMessage.");
     }
 
     /**
@@ -80,8 +83,8 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
     {
         setParameters(params);
 
-        if (DEBUG)
-            _log.debug("Created PapeMessage from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created PapeMessage from parameter list:\n" + params);
     }
 
     /**
@@ -103,7 +106,7 @@ public class PapeMessage implements MessageExtension, MessageExtensionFactory
      * The openid.ns.extension_type_uri parameter is also handled by
      * the Message class.
      *
-     * @see Message
+     * @see org.openid4java.message.Message
      */
     public ParameterList getParameters()
     {

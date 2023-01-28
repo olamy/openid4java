@@ -7,11 +7,15 @@ package org.openid4java.message.sreg;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the extension for Simple Registration fetch responses.
@@ -20,8 +24,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SRegResponse extends SRegMessage
 {
-    private static Log _log = LogFactory.getLog(SRegResponse.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SRegResponse.class);
 
     protected final static List<String> SREG_FIELDS = Arrays.asList("nickname", "email", "fullname", "dob", "gender",
             "postcode", "country", "language", "timezone");
@@ -31,7 +34,7 @@ public class SRegResponse extends SRegMessage
      */
     protected SRegResponse()
     {
-        if (DEBUG) _log.debug("Created empty fetch response.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty fetch response.");
     }
 
     /**
@@ -62,8 +65,8 @@ public class SRegResponse extends SRegMessage
         if (!resp.isValid())
             throw new MessageException("Invalid parameters for a SReg response");
 
-        if (DEBUG)
-            _log.debug("Created SReg response from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created SReg response from parameter list:\n {}", params);
 
         return resp;
     }
@@ -89,7 +92,7 @@ public class SRegResponse extends SRegMessage
         while (iter.hasNext())
         {
             String attr = (String) iter.next();
-            String value = (String) userData.get(attr);
+            String value = userData.get(attr);
             if (value != null)
                 resp.addAttribute(attr, value);
         }
@@ -113,8 +116,8 @@ public class SRegResponse extends SRegMessage
         if (! SREG_FIELDS.contains(attr))
             throw new MessageException("Invalid attribute for SReg: " + attr);
 
-        if (DEBUG)
-            _log.debug("Added new attribute to SReg response: " + attr +
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Added new attribute to SReg response: " + attr +
                        " value: " + value);
     }
 
@@ -172,7 +175,7 @@ public class SRegResponse extends SRegMessage
             String paramName = ((Parameter) o).getKey();
 
             if (!SREG_FIELDS.contains(paramName)) {
-                _log.warn("Invalid parameter name in SReg response: " + paramName);
+                LOGGER.warn("Invalid parameter name in SReg response: " + paramName);
                 return false;
             }
         }

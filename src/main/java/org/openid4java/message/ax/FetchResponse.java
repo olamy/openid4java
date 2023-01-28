@@ -4,11 +4,11 @@
 
 package org.openid4java.message.ax;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,8 +23,7 @@ import java.util.Map;
  */
 public class FetchResponse extends AxPayload
 {
-    private static Log _log = LogFactory.getLog(FetchResponse.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(FetchResponse.class);
 
     /**
      * Constructs a Fetch Response with an empty parameter list.
@@ -33,7 +32,7 @@ public class FetchResponse extends AxPayload
     {
         _parameters.set(new Parameter("mode", "fetch_response"));
 
-        if (DEBUG) _log.debug("Created empty fetch response.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty fetch response.");
     }
 
     /**
@@ -64,8 +63,8 @@ public class FetchResponse extends AxPayload
         if (! resp.isValid())
             throw new MessageException("Invalid parameters for a fetch response");
 
-        if (DEBUG)
-            _log.debug("Created fetch response from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created fetch response from parameter list:\n {}", params);
 
         return resp;
     }
@@ -154,7 +153,7 @@ public class FetchResponse extends AxPayload
             throw new MessageException("Invalid update_url: " + updateUrl);
         }
 
-        if (DEBUG) _log.debug("Setting fetch response update_url: " + updateUrl);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Setting fetch response update_url: {}", updateUrl);
 
         _parameters.set(new Parameter("update_url", updateUrl));
     }
@@ -180,7 +179,7 @@ public class FetchResponse extends AxPayload
         if ( ! _parameters.hasParameter("mode") ||
                 ! "fetch_response".equals(_parameters.getParameterValue("mode")))
         {
-            _log.warn("Invalid mode value in fetch_reponse: "
+            LOGGER.warn("Invalid mode value in fetch_reponse: "
                       + _parameters.getParameterValue("mode"));
             return false;
         }

@@ -12,17 +12,15 @@ import javax.crypto.interfaces.DHPrivateKey;
 import java.math.BigInteger;
 import java.security.*;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class DiffieHellmanSession
 {
-    private static Log _log = LogFactory.getLog(DiffieHellmanSession.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(DiffieHellmanSession.class);
     public static final String DEFAULT_MODULUS_HEX =
         "DCF93A0B883972EC0E19989AC5A2CE310E1D37717E8D9571BB7623731866E61E" +
         "F75A2E27898B057F9891C2E27A639C3F29B60814581CD3B2CA3986D268370557" +
@@ -93,7 +91,7 @@ public class DiffieHellmanSession
 
         DiffieHellmanSession dh = new DiffieHellmanSession(type, dhParameterSpec);
 
-        if (DEBUG) _log.debug("Created DH session: " + dh);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created DH session: {}", dh);
 
         return dh;
     }
@@ -123,14 +121,14 @@ public class DiffieHellmanSession
             DHParameterSpec result = (DHParameterSpec)
                     params.getParameterSpec(DHParameterSpec.class);
 
-            if (DEBUG) _log.debug("Generated random DHParameterSpec, base: "
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Generated random DHParameterSpec, base: "
                     + result.getG() + ", modulus: " + result.getP());
 
             return result;
         }
         catch (GeneralSecurityException e)
         {
-            _log.error("Cannot generate DH params for primeSize: "
+            LOGGER.error("Cannot generate DH params for primeSize: "
                     + primeSize + " keySize: " + keySize, e);
             return null;
         }
@@ -148,7 +146,7 @@ public class DiffieHellmanSession
         }
         catch (GeneralSecurityException e)
         {
-            _log.error("Cannot generate key pair for DHParameterSpec, base: "
+            LOGGER.error("Cannot generate key pair for DHParameterSpec, base: "
                     + dhSpec.getG() + ", modulus: "  + dhSpec.getP() );
 
             return null;
@@ -250,7 +248,7 @@ public class DiffieHellmanSession
 
         String encMacKeyBase64 = new String(Base64.encodeBase64(encMacKey));
 
-        if (DEBUG) _log.debug("Encrypted MAC key Base64: " + encMacKeyBase64);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Encrypted MAC key Base64: " + encMacKeyBase64);
 
         return encMacKeyBase64;
     }
@@ -295,7 +293,7 @@ public class DiffieHellmanSession
             macKey[i] = (byte) (b1 ^ b2);
         }
 
-        if (DEBUG) _log.debug("Decrypted MAC key Base64: "
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Decrypted MAC key Base64: "
                 + new String(Base64.encodeBase64(macKey)));
 
         return macKey;
@@ -322,7 +320,7 @@ public class DiffieHellmanSession
         }
         catch (GeneralSecurityException e)
         {
-            _log.error("Cannot create PublicKey object from: " + publicKeyBase64, e);
+            LOGGER.error("Cannot create PublicKey object from: " + publicKeyBase64, e);
 
             return null;
         }

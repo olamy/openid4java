@@ -4,12 +4,12 @@
 
 package org.openid4java.discovery.html;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.util.OpenID4JavaDOMParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLHeadElement;
 import org.w3c.dom.html.HTMLLinkElement;
@@ -26,8 +26,8 @@ import java.util.List;
  */
 public class CyberNekoDOMHtmlParser implements HtmlParser
 {
-    private static final Log _log = LogFactory.getLog(CyberNekoDOMHtmlParser.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CyberNekoDOMHtmlParser.class);
+    private static final boolean DEBUG = LOGGER.isDebugEnabled();
 
     /*
      * (non-Javadoc)
@@ -39,7 +39,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser
             throws DiscoveryException
     {
         if (DEBUG)
-            _log.debug("Parsing HTML data:\n" + htmlData);
+            LOGGER.debug("Parsing HTML data:\n" + htmlData);
 
         HTMLDocumentImpl doc = this.parseDocument(htmlData);
 
@@ -60,7 +60,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser
         }
 
         if (DEBUG)
-            _log.debug("HTML discovery result:\n" + result);
+            LOGGER.debug("HTML discovery result:\n" + result);
     }
 
     private HTMLDocumentImpl parseDocument(String htmlData) throws DiscoveryException
@@ -115,7 +115,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser
                         OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
             if (DEBUG)
-                _log.debug("Found OpenID1 endpoint: " + href);
+                LOGGER.debug("Found OpenID1 endpoint: " + href);
 
             result.setEndpoint1(href);
         }
@@ -129,7 +129,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser
                         OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
             if (DEBUG)
-                _log.debug("Found OpenID1 delegate: " + href);
+                LOGGER.debug("Found OpenID1 delegate: " + href);
 
             result.setDelegate1(href);
         }
@@ -143,7 +143,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser
                         OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
             if (DEBUG)
-                _log.debug("Found OpenID2 endpoint: " + href);
+                LOGGER.debug("Found OpenID2 endpoint: " + href);
 
             result.setEndpoint2(href);
         }
@@ -157,7 +157,7 @@ public class CyberNekoDOMHtmlParser implements HtmlParser
                         OpenIDException.DISCOVERY_HTML_PARSE_ERROR);
 
             if (DEBUG)
-                _log.debug("Found OpenID2 localID: " + href);
+                LOGGER.debug("Found OpenID2 localID: " + href);
 
             result.setDelegate2(href);
         }

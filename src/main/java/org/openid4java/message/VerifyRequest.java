@@ -4,9 +4,9 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -17,8 +17,7 @@ import org.openid4java.OpenIDException;
  */
 public class VerifyRequest extends AuthSuccess
 {
-    private static Log _log = LogFactory.getLog(VerifyRequest.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(VerifyRequest.class);
 
     public static final String MODE_CHKAUTH = "check_authentication";
 
@@ -48,7 +47,7 @@ public class VerifyRequest extends AuthSuccess
 
         req.validate();
 
-        if (DEBUG) _log.debug("Created verification request " +
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created verification request " +
                 "from a positive auth response:\n" + req.keyValueFormEncoding());
 
         return req;
@@ -61,7 +60,7 @@ public class VerifyRequest extends AuthSuccess
 
         req.validate();
 
-        if (DEBUG) _log.debug("Created verification request:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created verification request:\n"
                               + req.keyValueFormEncoding());
 
         return req;
@@ -89,8 +88,8 @@ public class VerifyRequest extends AuthSuccess
 
         set("openid.mode", MODE_IDRES);
 
-        if (DEBUG) _log.debug("Delegating verification request validity check " +
-                              "to auth response...");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Delegating verification request validity check to auth response...");
 
         super.validate();
 

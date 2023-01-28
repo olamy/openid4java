@@ -7,6 +7,8 @@ package org.openid4java.message.ax;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -15,8 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the extension for Attribute Exchange fetch requests.
@@ -26,9 +26,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FetchRequest extends AxMessage
 {
-    private static Log _log = LogFactory.getLog(FetchRequest.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static Logger LOGGER = LoggerFactory.getLogger(FetchRequest.class);
     private int _aliasCounter = 0;
 
     /**
@@ -38,7 +36,7 @@ public class FetchRequest extends AxMessage
     {
         _parameters.set(new Parameter("mode", "fetch_request"));
 
-        if (DEBUG) _log.debug("Created empty fetch request.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty fetch request.");
     }
 
     /**
@@ -76,8 +74,8 @@ public class FetchRequest extends AxMessage
         if (! req.isValid())
             throw new MessageException("Invalid parameters for a fetch request");
 
-        if (DEBUG)
-            _log.debug("Created fetch request from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created fetch request from parameter list:\n {}", params);
 
         return req;
     }
@@ -124,7 +122,7 @@ public class FetchRequest extends AxMessage
 
         setCount(alias, count);
 
-        if (DEBUG) _log.debug("Added new attribute to fetch request; type: "
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Added new attribute to fetch request; type: "
                               + typeUri + " alias: " + alias + " count: "
                               + count + " required: " + required);
     }
@@ -206,7 +204,7 @@ public class FetchRequest extends AxMessage
             throw new MessageException("Invalid update_url: " + updateUrl);
         }
 
-        if (DEBUG) _log.debug("Setting fetch request update_url: " + updateUrl);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Setting fetch request update_url: {}", updateUrl);
 
         _parameters.set(new Parameter("update_url", updateUrl));
     }
@@ -274,14 +272,14 @@ public class FetchRequest extends AxMessage
         if ( ! _parameters.hasParameter("required") &&
                 ! _parameters.hasParameter("if_available") )
         {
-            _log.warn("One of 'required' or 'if_available' parameters must be present.");
+            LOGGER.warn("One of 'required' or 'if_available' parameters must be present.");
             return false;
         }
 
         if ( ! _parameters.hasParameter("mode") ||
                 ! "fetch_request".equals(_parameters.getParameterValue("mode")))
         {
-            _log.warn("Invalid mode value in fetch_request: "
+            LOGGER.warn("Invalid mode value in fetch_request: "
                       + _parameters.getParameterValue("mode"));
             return false;
         }
@@ -294,7 +292,7 @@ public class FetchRequest extends AxMessage
                 String alias = aliases[i];
                 if ( ! _parameters.hasParameter("type." + alias) )
                 {
-                    _log.warn("Type missing for attribute alias: " + alias);
+                    LOGGER.warn("Type missing for attribute alias: " + alias);
                     return false;
                 }
 
@@ -310,7 +308,7 @@ public class FetchRequest extends AxMessage
                 String alias = aliases[i];
                 if ( ! _parameters.hasParameter("type." + alias) )
                 {
-                    _log.warn("Type missing for attribute alias: " + alias);
+                    LOGGER.warn("Type missing for attribute alias: " + alias);
                     return false;
                 }
 
@@ -329,7 +327,7 @@ public class FetchRequest extends AxMessage
                     ! paramName.equals("if_available") &&
                     ! paramName.equals("update_url"))
             {
-                _log.warn("Invalid parameter name in fetch request: " + paramName);
+                LOGGER.warn("Invalid parameter name in fetch request: " + paramName);
                 //return false;
             }
         }
@@ -346,7 +344,7 @@ public class FetchRequest extends AxMessage
                ! "unlimited".equals(_parameters.getParameterValue("count." + alias))) )
 
         {
-            _log.warn("Invalid value for count." + alias + ": " +
+            LOGGER.warn("Invalid value for count." + alias + ": " +
                       _parameters.getParameterValue("count." + alias));
             return false;
         }

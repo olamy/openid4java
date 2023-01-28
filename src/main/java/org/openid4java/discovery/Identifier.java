@@ -11,5 +11,5 @@ import java.io.Serializable;
  */
 public interface Identifier extends Serializable
 {
-    public String getIdentifier();
+    String getIdentifier();
 }

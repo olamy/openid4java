@@ -5,16 +5,29 @@
 package org.openid4java.server;
 
 import com.google.inject.Inject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
 import org.openid4java.association.AssociationSessionType;
 import org.openid4java.association.DiffieHellmanSession;
 import org.openid4java.discovery.yadis.YadisResolver;
-import org.openid4java.message.*;
+import org.openid4java.message.AssociationError;
+import org.openid4java.message.AssociationRequest;
+import org.openid4java.message.AssociationResponse;
+import org.openid4java.message.AuthFailure;
+import org.openid4java.message.AuthImmediateFailure;
+import org.openid4java.message.AuthRequest;
+import org.openid4java.message.AuthSuccess;
+import org.openid4java.message.DirectError;
+import org.openid4java.message.IndirectError;
+import org.openid4java.message.Message;
+import org.openid4java.message.MessageException;
+import org.openid4java.message.ParameterList;
+import org.openid4java.message.VerifyRequest;
+import org.openid4java.message.VerifyResponse;
 import org.openid4java.util.HttpFetcherFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,8 +39,7 @@ import java.net.URL;
  */
 public class ServerManager
 {
-    private static Log _log = LogFactory.getLog(ServerManager.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.class);
 
     /**
      * Keeps track of the associations established with consumer sites.
@@ -418,7 +430,7 @@ public class ServerManager
     {
         boolean isVersion2 = requestParams.hasParameter("openid.ns");
 
-        _log.info("Processing association request...");
+        LOGGER.info("Processing association request...");
 
         try
         {
@@ -444,7 +456,7 @@ public class ServerManager
                 Association assoc = _sharedAssociations.generate(
                         type.getAssociationType(), _expireIn);
 
-                _log.info("Returning shared association; handle: " + assoc.getHandle());
+                LOGGER.info("Returning shared association; handle: " + assoc.getHandle());
 
                 return AssociationResponse.createAssociationResponse(assocReq, assoc);
             }
@@ -454,7 +466,7 @@ public class ServerManager
             // association failed, respond accordingly
             if (isVersion2)
             {
-                _log.warn("Cannot establish association, " +
+                LOGGER.warn("Cannot establish association, " +
                            "responding with an OpenID2 association error.", e);
 
                 return AssociationError.createAssociationError(
@@ -462,7 +474,7 @@ public class ServerManager
             }
             else
             {
-                _log.warn("Error processing an OpenID1 association request: " +
+                LOGGER.warn("Error processing an OpenID1 association request: " +
                           e.getMessage() +
                           " Responding with a dummy association.", e);
                 try
@@ -482,7 +494,7 @@ public class ServerManager
                 }
                 catch (OpenIDException ee)
                 {
-                    _log.error("Error creating negative OpenID1 association response.", e);
+                    LOGGER.error("Error creating negative OpenID1 association response.", e);
                     return null;
                 }
 
@@ -628,7 +640,7 @@ public class ServerManager
                                 String opEndpoint,
                                 boolean signNow)
     {
-        _log.info("Parsing authentication request...");
+        LOGGER.info("Parsing authentication request...");
 
         AuthRequest authReq;
 
@@ -648,7 +660,7 @@ public class ServerManager
         {
             if (requestParams.hasParameter("openid.return_to"))
             {
-                _log.error("Invalid authentication request; " +
+                LOGGER.error("Invalid authentication request; " +
                            "responding with an indirect error message.", e);
 
                 return IndirectError.createIndirectError(e,
@@ -657,7 +669,7 @@ public class ServerManager
             }
             else
             {
-                _log.error("Invalid authentication request; " +
+                LOGGER.error("Invalid authentication request; " +
                            "responding with a direct error message.", e);
 
                 return DirectError.createDirectError( e, ! isVersion2 );
@@ -701,13 +713,13 @@ public class ServerManager
                                 String opEndpoint,
                                 boolean signNow)
     {
-        _log.info("Processing authentication request...");
+        LOGGER.info("Processing authentication request...");
 
         boolean isVersion2 = authReq.isVersion2();
 
         if (authReq.getReturnTo() == null)
         {
-            _log.error("No return_to in the received (valid) auth request; "
+            LOGGER.error("No return_to in the received (valid) auth request; "
                     + "returning null auth response.");
             return null;
         }
@@ -725,7 +737,7 @@ public class ServerManager
                     String errMsg = "Invalid OP-endpoint configured; " +
                             "cannot issue authentication responses." + opEndpoint;
 
-                    _log.error(errMsg, e);
+                    LOGGER.error(errMsg, e);
 
                     return DirectError.createDirectError(
                             new ServerException(errMsg, e), isVersion2);
@@ -751,7 +763,7 @@ public class ServerManager
                             "No identifier provided by the authentication request " +
                                     "or by the OpenID Provider");
 
-                if (DEBUG) _log.debug("Using ClaimedID: " + claimed +
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Using ClaimedID: " + claimed +
                         " OP-specific ID: " + id);
 
                 Association assoc = null;
@@ -763,11 +775,11 @@ public class ServerManager
                     assoc = _sharedAssociations.load(handle);
                     if (assoc == null)
                     {
-                        _log.info("Invalidating handle: " + handle);
+                        LOGGER.info("Invalidating handle: " + handle);
                         invalidateHandle = handle;
                     }
                     else
-                        _log.info("Loaded shared association; handle: " + handle);
+                        LOGGER.info("Loaded shared association; handle: " + handle);
                 }
 
                 if (assoc == null)
@@ -776,7 +788,7 @@ public class ServerManager
                             _prefAssocSessEnc.getAssociationType(),
                             _expireIn);
 
-                    _log.info("Generated private association; handle: "
+                    LOGGER.info("Generated private association; handle: "
                               + assoc.getHandle());
                 }
 
@@ -795,7 +807,7 @@ public class ServerManager
                 if (signNow)
                     response.setSignature(assoc.sign(response.getSignedText()));
 
-                _log.info("Returning positive assertion for " +
+                LOGGER.info("Returning positive assertion for " +
                           response.getReturnTo());
 
                 return response;
@@ -804,7 +816,7 @@ public class ServerManager
             {
                 if (authReq.isImmediate())
                 {
-                    _log.error("Responding with immediate authentication " +
+                    LOGGER.error("Responding with immediate authentication " +
                                "failure to " + authReq.getReturnTo());
 
                     authReq.setImmediate(false);
@@ -817,7 +829,7 @@ public class ServerManager
                 }
                 else
                 {
-                    _log.error("Responding with authentication failure to " +
+                    LOGGER.error("Responding with authentication failure to " +
                                authReq.getReturnTo());
 
                     return new AuthFailure(! isVersion2, authReq.getReturnTo());
@@ -828,7 +840,7 @@ public class ServerManager
         {
             if (authReq.hasParameter("openid.return_to"))
             {
-                _log.error("Error processing authentication request; " +
+                LOGGER.error("Error processing authentication request; " +
                            "responding with an indirect error message.", e);
 
                 return IndirectError.createIndirectError(e,
@@ -837,7 +849,7 @@ public class ServerManager
             }
             else
             {
-                _log.error("Error processing authentication request; " +
+                LOGGER.error("Error processing authentication request; " +
                            "responding with a direct error message.", e);
 
                 return DirectError.createDirectError( e, ! isVersion2 );
@@ -884,7 +896,7 @@ public class ServerManager
      */
     public Message verify(ParameterList requestParams)
     {
-        _log.info("Processing verification request...");
+        LOGGER.info("Processing verification request...");
 
         boolean isVersion2 = true;
 
@@ -901,14 +913,14 @@ public class ServerManager
 
             if (_checkPrivateSharedAssociations && _sharedAssociations.load(handle) != null)
             {
-                _log.warn("association for handle: " + handle + " expected to be private " +
+                LOGGER.warn("association for handle: " + handle + " expected to be private " +
                 "but was found in shared association store, denying direct verification request; " +
                 "please configure different association store/instances for private vs shared associations");
             }
             else if (assoc != null)
             {
                 // verify the signature
-                _log.info("Loaded private association; handle: " + handle);
+                LOGGER.info("Loaded private association; handle: " + handle);
 
                 verified = assoc.verifySignature(
                         vrfyReq.getSignedText(),
@@ -929,24 +941,24 @@ public class ServerManager
                 String invalidateHandle = vrfyReq.getInvalidateHandle();
                 if (invalidateHandle != null &&
                         _sharedAssociations.load(invalidateHandle) == null) {
-                    _log.info("Confirming shared association invalidate handle: "
+                    LOGGER.info("Confirming shared association invalidate handle: "
                             + invalidateHandle);
 
                     vrfyResp.setInvalidateHandle(invalidateHandle);
                 }
             }
             else
-                _log.error("Signature verification failed, handle: " + handle);
+                LOGGER.error("Signature verification failed, handle: " + handle);
 
 
-            _log.info("Responding with " + (verified? "positive" : "negative")
+            LOGGER.info("Responding with " + (verified? "positive" : "negative")
                       + " verification response");
 
             return vrfyResp;
         }
         catch (OpenIDException e)
         {
-            _log.error("Error processing verification request; " +
+            LOGGER.error("Error processing verification request; " +
                        "responding with verification error.", e);
 
             return DirectError.createDirectError(e, ! isVersion2);

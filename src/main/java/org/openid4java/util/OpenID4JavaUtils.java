@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Load properties from classpath:<code>org.openid4java.util.openid4java-default.properties</code>,
@@ -22,7 +22,7 @@ import org.openid4java.OpenIDException;
  */
 public class OpenID4JavaUtils
 {
-    private static Log _log = LogFactory.getLog(OpenID4JavaUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenID4JavaUtils.class);
 
     private static final Properties _appProperties;
 
@@ -52,7 +52,7 @@ public class OpenID4JavaUtils
             }
             catch (IOException e)
             {
-                _log.error("Load properties from " + name + " failed.", e);
+                LOGGER.error("Load properties from " + name + " failed.", e);
             }
             finally
             {
@@ -62,13 +62,13 @@ public class OpenID4JavaUtils
                 }
                 catch (IOException e)
                 {
-                    _log.warn("Error closing resource stream.", e);
+                    LOGGER.warn("Error closing resource stream.", e);
                 }
             }
         }
         else
         {
-            _log.debug("Resource " + name + " not found.");
+            LOGGER.debug("Resource " + name + " not found.");
         }
         return p;
     }

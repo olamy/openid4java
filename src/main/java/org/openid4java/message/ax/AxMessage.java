@@ -4,9 +4,13 @@
 
 package org.openid4java.message.ax;
 
-import org.openid4java.message.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.openid4java.message.MessageException;
+import org.openid4java.message.MessageExtension;
+import org.openid4java.message.MessageExtensionFactory;
+import org.openid4java.message.ParameterList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for the Attribute Exchange implementation.
@@ -20,13 +24,12 @@ import org.apache.commons.logging.LogFactory;
  * multpile values
  * </ul>
  *
- * @see Message MessageExtension
+ * @see org.openid4java.message.Message MessageExtension
  * @author Marius Scurtescu, Johnny Bufu
  */
 public class AxMessage implements MessageExtension, MessageExtensionFactory
 {
-    private static Log _log = LogFactory.getLog(AxMessage.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AxMessage.class);
 
     /**
      * The Attribute Exchange Type URI.
@@ -47,7 +50,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     {
         _parameters = new ParameterList();
 
-        if (DEBUG) _log.debug("Created empty AXMessage.");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created empty AXMessage.");
     }
 
     /**
@@ -61,8 +64,8 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
     {
         _parameters = params;
 
-        if (DEBUG)
-            _log.debug("Created AXMessage from parameter list:\n" + params);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Created AXMessage from parameter list:\n" + params);
     }
 
     /**
@@ -83,7 +86,7 @@ public class AxMessage implements MessageExtension, MessageExtensionFactory
      * The openid.ns.extension_type_uri parameter is also handled by
      * the Message class.
      *
-     * @see Message
+     * @see org.openid4java.message.Message
      */
     public ParameterList getParameters()
     {

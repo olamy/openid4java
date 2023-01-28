@@ -5,8 +5,6 @@
 package org.openid4java.consumer;
 
 import com.google.inject.Inject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
@@ -27,6 +25,8 @@ import org.openid4java.util.HttpFetcher;
 import org.openid4java.util.HttpFetcherFactory;
 import org.openid4java.util.HttpRequestOptions;
 import org.openid4java.util.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.spec.DHParameterSpec;
 import java.io.IOException;
@@ -47,9 +47,8 @@ import java.util.*;
  */
 public class ConsumerManager
 {
-    private static Log _log = LogFactory.getLog(ConsumerManager.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerManager.class);
+    
     /**
      * Discovery process manager.
      */
@@ -294,7 +293,7 @@ public class ConsumerManager
                     "Associations and stateless mode " +
                     "cannot be both disabled at the same time.");
 
-        if (_maxAssocAttempts == 0) _log.info("Associations disabled.");
+        if (_maxAssocAttempts == 0) LOGGER.info("Associations disabled.");
     }
 
     /**
@@ -610,18 +609,18 @@ public class ConsumerManager
         try
         {
 
-            if (DEBUG) _log.debug("Performing HTTP POST on " + url);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Performing HTTP POST on " + url);
             HttpResponse resp = _httpFetcher.post(url, request.getParameterMap());
             responseCode = resp.getStatusCode();
 
             String postResponse = resp.getBody();
             response.copyOf(ParameterList.createFromKeyValueForm(postResponse));
 
-            if (DEBUG) _log.debug("Retrived response:\n" + postResponse);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Retrived response:\n" + postResponse);
         }
         catch (IOException e)
         {
-            _log.error("Error talking to " + url +
+            LOGGER.error("Error talking to " + url +
                     " response code: " + responseCode, e);
         }
 
@@ -669,14 +668,14 @@ public class ConsumerManager
         {
             // no association established, return the first service endpoint
             DiscoveryInformation d0 = (DiscoveryInformation) discoveries.get(0);
-            _log.warn("Association failed; using first entry: " +
+            LOGGER.warn("Association failed; using first entry: " +
                       d0.getOPEndpoint());
 
             return d0;
         }
         else
         {
-            _log.error("Association attempt, but no discovery endpoints provided.");
+            LOGGER.error("Association attempt, but no discovery endpoints provided.");
             return null;
         }
     }
@@ -698,7 +697,7 @@ public class ConsumerManager
         URL opUrl = discovered.getOPEndpoint();
         String opEndpoint = opUrl.toString();
 
-        _log.info("Trying to associate with " + opEndpoint +
+        LOGGER.info("Trying to associate with " + opEndpoint +
                 " attempts left: " + maxAttempts);
 
         // check if there's an already established association
@@ -707,7 +706,7 @@ public class ConsumerManager
                 (Association.FAILED_ASSOC_HANDLE.equals(a.getHandle()) ||
                 a.getExpiry().getTime() - System.currentTimeMillis() > _preExpiryAssocLockInterval * 1000) )
         {
-            _log.info("Found an existing association: " + a.getHandle());
+            LOGGER.info("Found an existing association: " + a.getHandle());
             return 0;
         }
 
@@ -759,13 +758,13 @@ public class ConsumerManager
                 AssociationRequest assocReq =
                         (AssociationRequest) reqStack.pop();
 
-                if (DEBUG)
-                    _log.debug("Trying association type: " + assocReq.getType());
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("Trying association type: " + assocReq.getType());
 
                 // was this association / session type attempted already?
                 if (alreadyTried.keySet().contains(assocReq.getType()))
                 {
-                    if (DEBUG) _log.debug("Already tried.");
+                    if (LOGGER.isDebugEnabled()) LOGGER.debug("Already tried.");
                     continue;
                 }
 
@@ -797,17 +796,17 @@ public class ConsumerManager
                     {
                         // store the association and do no try alternatives
                         _associations.save(opEndpoint, assoc);
-                        _log.info("Associated with " + discovered.getOPEndpoint()
+                        LOGGER.info("Associated with " + discovered.getOPEndpoint()
                                 + " handle: " + assoc.getHandle());
                         break;
                     }
                     else
-                        _log.info("Discarding association response, " +
+                        LOGGER.info("Discarding association response, " +
                                   "not matching consumer criteria");
                 }
                 else if (status == HttpStatus.SC_BAD_REQUEST) // error response
                 {
-                    _log.info("Association attempt failed.");
+                    LOGGER.info("Association attempt failed.");
 
                     // retrieve fallback sess/assoc/encryption params set by OP
                     // and queue a new attempt
@@ -828,7 +827,7 @@ public class ConsumerManager
 
                     if (newReq != null)
                     {
-                        if (DEBUG) _log.debug("Retrieved association type " +
+                        if (LOGGER.isDebugEnabled()) LOGGER.debug("Retrieved association type " +
                                               "from the association error: " +
                                               newReq.getType());
 
@@ -838,7 +837,7 @@ public class ConsumerManager
             }
             catch (OpenIDException e)
             {
-                _log.error("Error encountered during association attempt.", e);
+                LOGGER.error("Error encountered during association attempt.", e);
             }
         }
 
@@ -887,13 +886,13 @@ public class ConsumerManager
                     assocReq = AssociationRequest.createAssociationRequest(type);
 
             if (assocReq == null)
-                _log.warn("Could not create association of type: " + type);
+                LOGGER.warn("Could not create association of type: " + type);
 
             return assocReq;
         }
         catch (OpenIDException e)
         {
-            _log.error("Error trying to create association request.", e);
+            LOGGER.error("Error trying to create association request.", e);
             return null;
         }
     }
@@ -1058,7 +1057,7 @@ public class ConsumerManager
             throw new ConsumerException("Authentication cannot be performed: " +
                     "no association available and stateless mode is disabled");
 
-        _log.info("Creating authentication request for" +
+        LOGGER.info("Creating authentication request for" +
                 " OP-endpoint: " + discovered.getOPEndpoint() +
                 " claimedID: " + claimedId +
                 " OP-specific ID: " + delegate);
@@ -1116,13 +1115,13 @@ public class ConsumerManager
             throws MessageException, DiscoveryException, AssociationException
     {
         VerificationResult result = new VerificationResult();
-        _log.info("Verifying authentication response...");
+        LOGGER.info("Verifying authentication response...");
 
         // non-immediate negative response
         if ( "cancel".equals(response.getParameterValue("openid.mode")) )
         {
             result.setAuthResponse(AuthFailure.createAuthFailure(response));
-            _log.info("Received auth failure.");
+            LOGGER.info("Received auth failure.");
             return result;
         }
 
@@ -1135,12 +1134,12 @@ public class ConsumerManager
                     AuthImmediateFailure.createAuthImmediateFailure(response);
             result.setAuthResponse(fail);
             result.setOPSetupUrl(fail.getUserSetupUrl());
-            _log.info("Received auth immediate failure.");
+            LOGGER.info("Received auth immediate failure.");
             return result;
         }
 
         AuthSuccess authResp = AuthSuccess.createAuthSuccess(response);
-        _log.info("Received positive auth response.");
+        LOGGER.info("Received positive auth response.");
 
         result.setAuthResponse(authResp);
 
@@ -1148,7 +1147,7 @@ public class ConsumerManager
         if (! verifyReturnTo(receivingUrl, authResp))
         {
             result.setStatusMsg("Return_To URL verification failed.");
-            _log.error("Return_To URL verification failed.");
+            LOGGER.error("Return_To URL verification failed.");
             return result;
         }
 
@@ -1157,7 +1156,7 @@ public class ConsumerManager
         if (discovered == null || ! discovered.hasClaimedIdentifier())
         {
             result.setStatusMsg("Discovered information verification failed.");
-            _log.error("Discovered information verification failed.");
+            LOGGER.error("Discovered information verification failed.");
             return result;
         }
 
@@ -1165,7 +1164,7 @@ public class ConsumerManager
         if (! verifyNonce(authResp, discovered))
         {
             result.setStatusMsg("Nonce verification failed.");
-            _log.error("Nonce verification failed.");
+            LOGGER.error("Nonce verification failed.");
             return result;
         }
 
@@ -1185,8 +1184,8 @@ public class ConsumerManager
      */
     public boolean verifyReturnTo(String receivingUrl, AuthSuccess response)
     {
-        if (DEBUG)
-            _log.debug("Verifying return URL; receiving: " + receivingUrl +
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Verifying return URL; receiving: " + receivingUrl +
                     "\nmessage: " + response.getReturnTo());
 
         URL receiving;
@@ -1198,7 +1197,7 @@ public class ConsumerManager
         }
         catch (MalformedURLException e)
         {
-            _log.error("Invalid return URL.", e);
+            LOGGER.error("Invalid return URL.", e);
             return false;
         }
 
@@ -1219,8 +1218,8 @@ public class ConsumerManager
                 ! receiving.getAuthority().equals(returnTo.getAuthority()) ||
                 ! receivingPath.toString().equals(returnToPath.toString()) )
         {
-            if (DEBUG)
-                _log.debug("Return URL schema, authority or " +
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Return URL schema, authority or " +
                            "path verification failed.");
             return false;
         }
@@ -1235,8 +1234,8 @@ public class ConsumerManager
 
             if (receivingParams == null)
             {
-                if (DEBUG)
-                    _log.debug("Return URL query parameters verification failed.");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("Return URL query parameters verification failed.");
                 return false;
             }
 
@@ -1251,15 +1250,15 @@ public class ConsumerManager
                         receivingValues.size() != returnToValues.size() ||
                         ! receivingValues.containsAll( returnToValues ) )
                 {
-                    if (DEBUG)
-                        _log.debug("Return URL query parameters verification failed.");
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Return URL query parameters verification failed.");
                     return false;
                 }
             }
         }
         catch (UnsupportedEncodingException e)
         {
-            _log.error("Error verifying return URL query parameters.", e);
+            LOGGER.error("Error verifying return URL query parameters.", e);
             return false;
         }
 
@@ -1358,14 +1357,14 @@ public class ConsumerManager
         {
 			try
 			{
-				if (DEBUG) _log.debug( "Creating private association for opUrl " + opUrl);
+				if (LOGGER.isDebugEnabled()) LOGGER.debug( "Creating private association for opUrl " + opUrl);
 				privateAssoc = Association.generate(
 				      getPrefAssocSessEnc().getAssociationType(), "", _failedAssocExpire);
 				_privateAssociations.save( opUrl, privateAssoc );
 			}
 			catch ( AssociationException e )
 			{
-				_log.error("Cannot initialize private association.", e);
+				LOGGER.error("Cannot initialize private association.", e);
 				return null;
 			}
         }
@@ -1378,13 +1377,13 @@ public class ConsumerManager
                     URLEncoder.encode(privateAssoc.sign(returnTo),
                             "UTF-8");
 
-            _log.info("Inserted consumer nonce: " + nonce);
+            LOGGER.info("Inserted consumer nonce: " + nonce);
 
-            if (DEBUG) _log.debug("return_to:" + returnTo);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("return_to:" + returnTo);
         }
         catch (Exception e)
         {
-            _log.error("Error inserting consumre nonce.", e);
+            LOGGER.error("Error inserting consumre nonce.", e);
             return null;
         }
 
@@ -1402,8 +1401,8 @@ public class ConsumerManager
      */
     public String extractConsumerNonce(String returnTo, String opUrl)
     {
-        if (DEBUG)
-            _log.debug("Extracting consumer nonce...");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Extracting consumer nonce...");
 
         String nonce = null;
         String signature = null;
@@ -1415,13 +1414,13 @@ public class ConsumerManager
         }
         catch (MalformedURLException e)
         {
-            _log.error("Invalid return_to: " + returnTo, e);
+            LOGGER.error("Invalid return_to: " + returnTo, e);
             return null;
         }
 
         String query = returnToUrl.getQuery();
         if (query == null) {
-            _log.error("Missing nonce in return_to query parameters, required for v1 responses");
+            LOGGER.error("Missing nonce in return_to query parameters, required for v1 responses");
             return null;
         }
 
@@ -1436,19 +1435,19 @@ public class ConsumerManager
                 if (keyVal.length == 2 && "openid.rpnonce".equals(keyVal[0]))
                 {
                     nonce = URLDecoder.decode(keyVal[1], "UTF-8");
-                    if (DEBUG) _log.debug("Extracted consumer nonce: " + nonce);
+                    if (LOGGER.isDebugEnabled()) LOGGER.debug("Extracted consumer nonce: " + nonce);
                 }
 
                 if (keyVal.length == 2 && "openid.rpsig".equals(keyVal[0]))
                 {
                     signature = URLDecoder.decode(keyVal[1], "UTF-8");
-                    if (DEBUG) _log.debug("Extracted consumer nonce signature: "
+                    if (LOGGER.isDebugEnabled()) LOGGER.debug("Extracted consumer nonce signature: "
                                           + signature);
                 }
             }
             catch (UnsupportedEncodingException e)
             {
-                _log.error("Error extracting consumer nonce / signarure.", e);
+                LOGGER.error("Error extracting consumer nonce / signarure.", e);
                 return null;
             }
         }
@@ -1456,38 +1455,38 @@ public class ConsumerManager
         // check the signature
         if (signature == null)
         {
-            _log.error("Null consumer nonce signature.");
+            LOGGER.error("Null consumer nonce signature.");
             return null;
         }
 
         String signed = returnTo.substring(0, returnTo.indexOf("&openid.rpsig="));
-        if (DEBUG) _log.debug("Consumer signed text:\n" + signed);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Consumer signed text:\n" + signed);
 
         try
         {
-            if (DEBUG) _log.debug( "Loading private association for opUrl " + opUrl );
+            if (LOGGER.isDebugEnabled()) LOGGER.debug( "Loading private association for opUrl " + opUrl );
             Association privateAssoc = _privateAssociations.load(opUrl);
             if( privateAssoc == null )
             {
-                _log.error("Null private association.");
+                LOGGER.error("Null private association.");
                 return null;
             }
 
             if (privateAssoc.verifySignature(signed, signature))
             {
-                _log.info("Consumer nonce signature verified.");
+                LOGGER.info("Consumer nonce signature verified.");
                 return nonce;
             }
 
             else
             {
-                _log.error("Consumer nonce signature failed.");
+                LOGGER.error("Consumer nonce signature failed.");
                 return null;
             }
         }
         catch (AssociationException e)
         {
-            _log.error("Error verifying consumer nonce signature.", e);
+            LOGGER.error("Error verifying consumer nonce signature.", e);
             return null;
         }
     }
@@ -1513,7 +1512,7 @@ public class ConsumerManager
     {
         if (authResp == null || authResp.getIdentity() == null)
         {
-            _log.info("Assertion is not about an identifier");
+            LOGGER.info("Assertion is not about an identifier");
             return null;
         }
 
@@ -1545,8 +1544,8 @@ public class ConsumerManager
         if ( authResp == null || authResp.isVersion2() ||
              authResp.getIdentity() == null )
         {
-            if (DEBUG)
-                _log.error("Invalid authentication response: " +
+            if (LOGGER.isDebugEnabled())
+                LOGGER.error("Invalid authentication response: " +
                            "cannot verify v1 discovered information");
             return null;
         }
@@ -1558,8 +1557,8 @@ public class ConsumerManager
              discovered.getClaimedIdentifier() != null )
         {
             // statefull mode
-            if (DEBUG)
-                _log.debug("Verifying discovered information " +
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Verifying discovered information " +
                            "for OpenID1 assertion about ClaimedID: " +
                            discovered.getClaimedIdentifier().getIdentifier());
 
@@ -1572,13 +1571,13 @@ public class ConsumerManager
         }
 
         // stateless, bare response, or the user changed the ID at the OP
-        _log.info("Proceeding with stateless mode / bare response verification...");
+        LOGGER.info("Proceeding with stateless mode / bare response verification...");
 
         DiscoveryInformation firstServiceMatch = null;
 
         // assuming openid.identity is the claimedId
         // (delegation can't work with stateless/bare resp v1 operation)
-        if (DEBUG) _log.debug(
+        if (LOGGER.isDebugEnabled()) LOGGER.debug(
             "Performing discovery on the ClaimedID in the assertion: " + assertId);
         List discoveries = _discovery.discover(assertId);
 
@@ -1593,7 +1592,7 @@ public class ConsumerManager
                 ! assertId.equals(service.getClaimedIdentifier().getIdentifier()))
                 continue;
 
-            if (DEBUG) _log.debug("Found matching service: " + service);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Found matching service: " + service);
 
             // keep the first endpoint that matches
             if (firstServiceMatch == null)
@@ -1606,15 +1605,15 @@ public class ConsumerManager
             // don't look further if there is an association with this endpoint
             if (assoc != null)
             {
-                if (DEBUG)
-                    _log.debug("Found existing association for  " + service +
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("Found existing association for  " + service +
                         " Not looking for another service endpoint.");
                 return service;
             }
         }
 
         if (firstServiceMatch == null)
-            _log.error("No service element found to match " +
+            LOGGER.error("No service element found to match " +
                 "the identifier in the assertion.");
 
         return firstServiceMatch;
@@ -1642,8 +1641,8 @@ public class ConsumerManager
         if (authResp == null || ! authResp.isVersion2() ||
                 authResp.getIdentity() == null || authResp.getClaimed() == null)
         {
-            if (DEBUG)
-                _log.debug("Discovered information doesn't match " +
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Discovered information doesn't match " +
                            "auth response / version");
             return null;
         }
@@ -1658,8 +1657,8 @@ public class ConsumerManager
         // the OP endpoint sent in the response
         String respEndpoint = authResp.getOpEndpoint();
 
-        if (DEBUG)
-            _log.debug("Verifying discovered information for OpenID2 assertion " +
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Verifying discovered information for OpenID2 assertion " +
                        "about ClaimedID: " + respClaimed.getIdentifier());
 
 
@@ -1676,7 +1675,7 @@ public class ConsumerManager
                     discovered.isVersion2() &&
                     discovered.getOPEndpoint().toString().equals(respEndpoint))
             {
-                if (DEBUG) _log.debug(
+                if (LOGGER.isDebugEnabled()) LOGGER.debug(
                         "ClaimedID in the assertion was previously discovered: "
                         + respClaimed);
                 return discovered;
@@ -1687,7 +1686,7 @@ public class ConsumerManager
         DiscoveryInformation firstServiceMatch = null;
 
         // perform discovery on the claim identifier in the assertion
-        if(DEBUG) _log.debug(
+        if(LOGGER.isDebugEnabled()) LOGGER.debug(
                 "Performing discovery on the ClaimedID in the assertion: "
                  + respClaimed);
         List discoveries = _discovery.discover(respClaimed);
@@ -1695,8 +1694,8 @@ public class ConsumerManager
         // find the newly discovered service endpoint that matches the assertion
         // - OP endpoint, OP-specific ID and protocol version must match
         // - prefer (first = highest priority) endpoint with an association
-        if (DEBUG)
-            _log.debug("Looking for a service element to match " +
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Looking for a service element to match " +
                        "the ClaimedID and OP endpoint in the assertion...");
         Iterator iter = discoveries.iterator();
         while (iter.hasNext())
@@ -1718,7 +1717,7 @@ public class ConsumerManager
             // keep the first endpoint that matches
             if (firstServiceMatch == null)
             {
-                if (DEBUG) _log.debug("Found matching service: " + service);
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Found matching service: " + service);
                 firstServiceMatch = service;
             }
 
@@ -1729,15 +1728,15 @@ public class ConsumerManager
             // don't look further if there is an association with this endpoint
             if (assoc != null)
             {
-                if (DEBUG)
-                    _log.debug("Found existing association, " +
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("Found existing association, " +
                                "not looking for another service endpoint.");
                 return service;
             }
         }
 
         if (firstServiceMatch == null)
-            _log.error("No service element found to match " +
+            LOGGER.error("No service element found to match " +
                        "the ClaimedID / OP-endpoint in the assertion.");
 
         return firstServiceMatch;
@@ -1758,7 +1757,7 @@ public class ConsumerManager
     {
         if (discovered == null || authResp == null)
         {
-            _log.error("Can't verify signature: " +
+            LOGGER.error("Can't verify signature: " +
                        "null assertion or discovered information.");
 
             result.setStatusMsg("Can't verify signature: " +
@@ -1777,7 +1776,7 @@ public class ConsumerManager
 
         if (assoc != null) // association available, local verification
         {
-            _log.info("Found association: " + assoc.getHandle() +
+            LOGGER.info("Found association: " + assoc.getHandle() +
                       " verifying signature locally...");
             String text = authResp.getSignedText();
             String signature = authResp.getSignature();
@@ -1785,19 +1784,19 @@ public class ConsumerManager
             if (assoc.verifySignature(text, signature))
             {
                 result.setVerifiedId(claimedId);
-                if (DEBUG) _log.debug("Local signature verification succeeded.");
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Local signature verification succeeded.");
             }
             else
             {
                 result.setStatusMsg("Local signature verification failed");
-                if (DEBUG)
-                    _log.debug("Local signature verification failed.");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("Local signature verification failed.");
             }
 
         }
         else // no association, verify with the OP
         {
-            _log.info("No association found, " +
+            LOGGER.info("No association found, " +
                       "contacting the OP for direct verification...");
 
             VerifyRequest vrfy = VerifyRequest.createVerifyRequest(authResp);
@@ -1820,14 +1819,14 @@ public class ConsumerManager
                         _associations.remove(op.toString(), invalidateHandle);
 
                     result.setVerifiedId(claimedId);
-                    if (DEBUG)
-                        _log.debug("Direct signature verification succeeded " +
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Direct signature verification succeeded " +
                                    "with OP: " + op);
                 }
                 else
                 {
-                    if (DEBUG)
-                        _log.debug("Direct signature verification failed " +
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Direct signature verification failed " +
                                 "with OP: " + op);
                     result.setStatusMsg("Direct signature verification failed.");
                 }
@@ -1836,7 +1835,7 @@ public class ConsumerManager
             {
                 DirectError err = DirectError.createDirectError(responseParams);
 
-                if (DEBUG) _log.debug("Error verifying signature with the OP: "
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Error verifying signature with the OP: "
                        + op + " error message: " + err.keyValueFormEncoding());
 
                 result.setStatusMsg("Error verifying signature with the OP: "
@@ -1846,10 +1845,10 @@ public class ConsumerManager
 
         Identifier verifiedID = result.getVerifiedId();
         if (verifiedID != null)
-            _log.info("Verification succeeded for: " + verifiedID);
+            LOGGER.info("Verification succeeded for: " + verifiedID);
 
         else
-            _log.error("Verification failed for: " + authResp.getClaimed()
+            LOGGER.error("Verification failed for: " + authResp.getClaimed()
                        + " reason: " + result.getStatusMsg());
 
         return result;

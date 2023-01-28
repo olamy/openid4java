@@ -4,12 +4,12 @@
 
 package org.openid4java.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.association.Association;
 import org.openid4java.association.AssociationException;
 import org.openid4java.util.InternetDateFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,25 +24,22 @@ import java.util.List;
  */
 public class AuthSuccess extends Message
 {
-    private static Log _log = LogFactory.getLog(AuthSuccess.class);
-    private static final boolean DEBUG = _log.isDebugEnabled();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthSuccess.class);
 
-    protected final static List requiredFields = Arrays.asList( new String[] {
+    protected final static List<String> requiredFields = Arrays.asList(
             "openid.mode",
             "openid.return_to",
             "openid.assoc_handle",
             "openid.signed",
-            "openid.sig"
-    });
+            "openid.sig");
 
-    protected final static List optionalFields = Arrays.asList( new String[] {
+    protected final static List<String> optionalFields = Arrays.asList(
             "openid.ns",
             "openid.op_endpoint",
             "openid.claimed_id",
             "openid.identity",
             "openid.response_nonce",
-            "openid.invalidate_handle"
-    });
+            "openid.invalidate_handle");
 
     // required signed list in OpenID 1.x
     protected final static String signRequired1 = "return_to,identity";
@@ -104,8 +101,7 @@ public class AuthSuccess extends Message
 
         resp.validate();
 
-        if (DEBUG) _log.debug("Created positive auth response:\n"
-                              + resp.keyValueFormEncoding());
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created positive auth response: {}", resp.keyValueFormEncoding());
 
         return resp;
     }
@@ -117,7 +113,7 @@ public class AuthSuccess extends Message
 
         resp.validate();
 
-        if (DEBUG) _log.debug("Created positive auth response:\n"
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Created positive auth response:\n"
                               + resp.keyValueFormEncoding());
 
         return resp;
@@ -288,7 +284,7 @@ public class AuthSuccess extends Message
             }
         }
 
-        if (DEBUG) _log.debug("Setting fields to be signed: " + toSign);
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("Setting fields to be signed: {}", toSign);
 
         set("openid.signed", toSign.toString());
 
@@ -366,7 +362,7 @@ public class AuthSuccess extends Message
     {
         set("openid.sig", sig);
 
-        if(DEBUG) _log.debug("Added signature: " + sig);
+        if(LOGGER.isDebugEnabled()) LOGGER.debug("Added signature: {}", sig);
     }
 
     public String getSignature()
@@ -384,7 +380,7 @@ public class AuthSuccess extends Message
      */
     public String getSignedText()
     {
-        StringBuffer signedText = new StringBuffer("");
+        StringBuilder signedText = new StringBuilder("");
 
         String[] signedParams = getParameterValue("openid.signed").split(",");
 
@@ -535,7 +531,7 @@ public class AuthSuccess extends Message
 
         } else if (nonce != null)
         {
-            _log.warn("openid.response_nonce present in OpenID1 auth response");
+            LOGGER.warn("openid.response_nonce present in OpenID1 auth response");
 //            return false;
         }
 
@@ -552,14 +548,14 @@ public class AuthSuccess extends Message
         // either compatibility mode or nonce signed
         if ( compatibility == signedFields.contains("response_nonce") )
         {
-            _log.warn("response_nonce must be present and signed only in OpenID2 auth responses");
+            LOGGER.warn("response_nonce must be present and signed only in OpenID2 auth responses");
 //            return false;
         }
 
         // either compatibility mode or op_endpoint signed
         if ( compatibility == signedFields.contains("op_endpoint") )
         {
-            _log.warn("op_endpoint must be present and signed only in OpenID2 auth responses");
+            LOGGER.warn("op_endpoint must be present and signed only in OpenID2 auth responses");
 //            return false;
         }
 
