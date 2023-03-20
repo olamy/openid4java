@@ -30,7 +30,7 @@
     <test.data.src>${basedir}/src/test/yadisdata</test.data.src>
     <test.data.build>${basedir}/target/test-data</test.data.build>
     <test.servlet.port>0</test.servlet.port>
-    <slf4j.version>1.7.36</slf4j.version>
+    <slf4j.version>2.0.7</slf4j.version>
   </properties>
 
   <build>
